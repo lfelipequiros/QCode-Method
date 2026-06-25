@@ -1,0 +1,33 @@
+# ── Secrets & credentials (never commit) ────────────────────────────
+.env
+.env.*
+!.env.example
+credentials/
+*.pem
+
+# ── Dependencies & build output ─────────────────────────────────────
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# ── Build Cockpit — generated artifact (the generator is what's tracked) ─
+cockpit/index.html
+
+# ── Tooling / logs / OS noise ───────────────────────────────────────
+.vercel/
+*.log
+.DS_Store
+Thumbs.db
+
+# ── Claude Code per-machine settings (shared settings.json is tracked) ─
+.claude/settings.local.json
+
+# ── External (installed) skills — restored via your skills tooling ──────
+# Authored skills under .claude/skills/ are tracked by default. Ignore each
+# EXTERNAL (installed) skill by name so a new hand-authored skill is never
+# silently dropped. Add a line per installed skill, e.g.:
+# /.claude/skills/some-installed-skill

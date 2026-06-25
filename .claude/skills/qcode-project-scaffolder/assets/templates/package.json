@@ -1,0 +1,8 @@
+{
+  "name": "{{PROJECT_SLUG}}",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cockpit": "node cockpit/generate.mjs"
+  }
+}

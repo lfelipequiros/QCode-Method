@@ -1,0 +1,36 @@
+#!/bin/sh
+# {{PROJECT_NAME}} SDLC guard — keep the status board honest.
+#
+# Status lives ONLY in PROJECT-STATUS.md (zero duplication). If a commit changes
+# the plan (a backlog epic/story) or app code but does not touch the board, the
+# board is going stale. Block, with an explicit override for the rare commit that
+# genuinely has no status impact.
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$staged" ] && exit 0
+
+# Was the board itself updated in this commit?
+board=$(printf '%s\n' "$staged" | grep -xE 'PROJECT-STATUS\.md')
+
+# "Moves the work" = a backlog epic/adhoc story, or real source code (not tests).
+work=$(printf '%s\n' "$staged" \
+  | grep -E '^backlog/(epic-|08-adhoc)|\.(ts|tsx|js|jsx|mjs|sql|py|go|rs)$' \
+  | grep -ivE '(^|/)(tests?|__tests__)/|\.(test|spec)\.')
+
+if [ -n "$work" ] && [ -z "$board" ]; then
+  echo "------------------------------------------------------------------"
+  echo "  SDLC guard: PROJECT-STATUS.md was not updated"
+  echo "------------------------------------------------------------------"
+  echo "  This commit changes the plan or code but not the status board."
+  echo "  Status lives ONLY on the board, so it is now probably stale."
+  echo ""
+  echo "  Fix: update PROJECT-STATUS.md (epic/story status + Recently done)"
+  echo "       and include it in this same commit."
+  echo ""
+  echo "  Override (rare — only if there is truly no status impact):"
+  echo "       git commit --no-verify"
+  echo "------------------------------------------------------------------"
+  exit 1
+fi
+
+exit 0

@@ -1,0 +1,4 @@
+# Normalize line endings to LF repo-wide. The templates ship a POSIX `pre-commit` hook and `.mjs`
+# scripts that must stay LF even on a Windows checkout, so they run correctly when copied into a
+# target project.
+* text=auto eol=lf

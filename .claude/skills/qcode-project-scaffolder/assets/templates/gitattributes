@@ -1,0 +1,7 @@
+# Force LF line endings repo-wide — avoids CRLF churn across machines/CI.
+* text=auto eol=lf
+
+# Shell scripts and hooks must stay LF to run.
+*.sh   text eol=lf
+*.mjs  text eol=lf
+.githooks/* text eol=lf

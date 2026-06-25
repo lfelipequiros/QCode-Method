@@ -1,0 +1,14 @@
+# QCode-Method framework repo — keep it lean.
+# (This is the framework itself; it does not run an app, so there are few build artifacts.)
+
+# qcode-sync writes these into TARGET projects, never here — ignored as a safety net:
+*.qcode-bak
+
+# Node, if ever introduced:
+node_modules/
+
+# OS / editor noise:
+.DS_Store
+Thumbs.db
+*.log
+.claude/settings.local.json
