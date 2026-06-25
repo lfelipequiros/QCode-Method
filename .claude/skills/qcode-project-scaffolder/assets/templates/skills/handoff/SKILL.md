@@ -2,9 +2,11 @@
 name: handoff
 description: >-
   Session handoff for the {{PROJECT_NAME}} project — write a durable summary of a work session, or
-  load a past one to resume in a fresh chat without replaying the transcript. Use WRITE mode at the
-  end of a session or when the user says "write a handoff / summarize this session / wrap up / I'm
-  closing this chat / hand off." Use LOAD mode at the start of a new chat or when the user says "load
+  load a past one to resume in a fresh chat without replaying the transcript. Use WRITE mode
+  deliberately — when you're pausing or closing a *specific topic/thread worth resuming later*, or when
+  the user says "write a handoff / summarize this session / wrap up / I'm closing this chat / hand off."
+  It is ON-DEMAND, not an automatic per-story step (routine story wrap-up is `record-learnings`). Use
+  LOAD mode at the start of a new chat or when the user says "load
   the handoff / resume / catch me up / where did we leave off / what were we doing on X." A handoff
   captures the session NARRATIVE, decisions (linked to where they landed), repo changes (commit
   hashes), and open threads — never a copy of live state (that's PROJECT-STATUS / TECH-DEBT / ADRs,
@@ -89,4 +91,6 @@ Triggers: "load the handoff," "resume," "catch me up," "what were we doing on <t
 - **One handoff per session**, dated. If a session spans many topics, tag them all.
 - **Don't let handoffs rot into a second source of truth.** They're history. Current state is always
   `PROJECT-STATUS`; a handoff tells you the story and where to look.
-- Skip it for trivial one-off exchanges — a handoff is for sessions worth resuming.
+- **Not every story needs a handoff.** The routine end-of-story wrap-up is `record-learnings` (it runs
+  every time). Reach for a handoff only when there's a narrative thread worth carrying into a future
+  chat — a specific topic you'll resume. Skip it for trivial one-off exchanges.

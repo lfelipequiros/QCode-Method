@@ -100,12 +100,16 @@ implementation only after approval.
 - **Decisions → ADRs** ([`architecture/01-principles-and-decisions.md`](architecture/01-principles-and-decisions.md));
   **deliberate shortcuts → [`TECH-DEBT.md`](TECH-DEBT.md)** (each with a paydown trigger);
   **external blockers → [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md)**; **sessions → `handoffs/`**.
-- **Close the knowledge loop (the learnings sweep).** At the end of a story or session — *before*
-  writing the handoff — run **`record-learnings`** to sweep the session for durable knowledge the
-  in-flight gates missed and route each to its canonical home (a decision → ADR, a shortcut →
-  TECH-DEBT, an external unknown → OPEN-QUESTIONS, a business/domain fact → this file, an architecture
-  change → the ASD, a cross-session fact → memory). The sweep *links*, never duplicates; the handoff
-  then captures the narrative on top: build → … → tech-qa → merge → **record-learnings → handoff**.
+- **Close the knowledge loop (the learnings sweep).** At the end of a story or session, run
+  **`record-learnings`** to sweep the session for durable knowledge the in-flight gates missed and
+  route each to its canonical home (a decision → ADR, a shortcut → TECH-DEBT, an external unknown →
+  OPEN-QUESTIONS, a business/domain fact → this file, an architecture change → the ASD, a
+  cross-session fact → memory). The sweep *links*, never duplicates. **This is where the routine
+  delivery flow ends:** build → … → tech-qa → merge → **record-learnings**.
+- **`handoff` is on-demand, not a per-story step.** Write a handoff only when you're pausing or
+  closing a *specific topic/conversation worth resuming later* (or when asked) — not at the end of
+  every story. When you do write one, run `record-learnings` first so the handoff can link to what it
+  filed.
 - **Value lens always on:** when proposing anything, name which value archetype it serves.
 
 ---

@@ -3,15 +3,15 @@ name: record-learnings
 description: >-
   End-of-story/session knowledge sweep for the {{PROJECT_NAME}} project — the net that catches durable
   learnings the in-flight gates missed and routes each to its canonical home. Use it when a story or
-  session is wrapping up, BEFORE writing the handoff, or when the user says "record/capture the
+  session is wrapping up, or when the user says "record/capture the
   learnings, what should we document, did we miss any docs, reconcile the docs, close the loop,
   end-of-story sweep, update the docs from this session." It reviews the session (cross-checked against
   git) and, for each durable thing learned, decides its home: a decision → ADR, a shortcut →
   TECH-DEBT, an external unknown → OPEN-QUESTIONS, a business/domain fact → CLAUDE.md, an architecture
   change → the ASD, a cross-session fact → memory. It LINKS, never duplicates, and proposes edits for
-  approval before applying. It does NOT write the session narrative (that's `handoff`, run after this)
-  and does NOT change PROJECT-STATUS status values (gate-owned — it only flags drift). It captures
-  knowledge, it doesn't plan or code.
+  approval before applying. It does NOT write the session narrative (that's `handoff`, a separate
+  on-demand tool, not an every-story step) and does NOT change PROJECT-STATUS status values (gate-owned
+  — it only flags drift). It captures knowledge, it doesn't plan or code.
 ---
 
 # Record Learnings
@@ -28,14 +28,18 @@ decides *what belongs where* and writes it there, **linking** between files rath
 copied fact is the drift bug the whole system designs against). If the destination already covers a
 learning, that's a no-op — say so and move on.
 
-**Where it sits in the lifecycle:** `build → push + PR → review → tech-qa → merge → record-learnings →
-handoff`. Run this **before** the handoff, so the handoff can link to the ADR/debt rows this sweep just
-created (see [`CLAUDE.md`](../../../CLAUDE.md) §7).
+**Where it sits in the lifecycle:** it is the **final step of the routine delivery flow** — `build →
+push + PR → review → tech-qa → merge → record-learnings`. `handoff` is **not** part of that routine:
+it's a separate, on-demand tool for specific topics (see "Not `handoff`" below), not an every-story
+step. *If* you do also write a handoff for the session, run this sweep first so the handoff can link to
+the ADR/debt rows it created (see [`CLAUDE.md`](../../../CLAUDE.md) §7).
 
 ## What this skill is NOT
 
-- **Not `handoff`.** Handoff writes the session *narrative + open threads* into one journal file. This
-  persists *durable knowledge* into *many canonical files*. Run this first, then handoff.
+- **Not `handoff`.** Handoff writes the session *narrative + open threads* into one journal file, and
+  only when a topic is worth resuming later — it's **on-demand, not routine**. This sweep persists
+  *durable knowledge* into *many canonical files* and is the routine close of **every** story. If you
+  happen to write a handoff too, run this first so it can link to what this filed.
 - **Not a gate.** It doesn't review or verify code (`tech-qa`) or plan it (`tech-planning`).
 - **Not a status updater.** PROJECT-STATUS status values are owned by the gates. This skill only
   **flags** a status that drifted from reality — it doesn't set it.
@@ -56,8 +60,9 @@ created (see [`CLAUDE.md`](../../../CLAUDE.md) §7).
    is sensitive). Nothing is written until approved.
 5. **Apply on approval**, honoring each destination's own format (the ADR template, the debt columns,
    the open-question row). Link across files; never duplicate.
-6. **Hand to `handoff`.** Remind the user the *narrative* goes in the handoff next, and to **commit**
-   the doc changes (the `.githooks/pre-commit` guard backstops status-board consistency).
+6. **Close out.** **Commit** the doc changes (the `.githooks/pre-commit` guard backstops status-board
+   consistency) — that completes the routine wrap-up. *Only if* this session is a topic worth resuming
+   later, reach for `handoff` next to capture the narrative; it's optional, not every story.
 
 ## Routing table — what goes where
 
@@ -75,7 +80,7 @@ knowledge itself.
 | A **scope / roadmap** change | [`backlog/`](../../../backlog/) | an epic/story edit (acceptance criteria, sequencing) |
 | A **cross-session fact** worth carrying to the next chat (who the user is, feedback, a project constraint, a reference) | the auto-memory store (if the harness has one) | a memory file per the memory rules |
 | The **status of an epic/increment** drifted from reality | flag it — route to the owning **gate** | *do not edit status here*; the gates own PROJECT-STATUS |
-| The **session narrative / open threads** | [`handoffs/`](../../../handoffs/) | defer — that's `handoff`, run after this sweep |
+| The **session narrative / open threads** — *only if the topic is worth resuming later* | [`handoffs/`](../../../handoffs/) | defer to `handoff` — an on-demand tool, not an every-story step |
 | *(to define: project-specific homes — add a row for each canonical doc this project keeps beyond the scaffold defaults, e.g. a cost/expenses log, a standing strategic-posture file, an integration-research doc, or an environments/deployment runbook. Map each kind of learning to that file during foundation.)* | — | — |
 
 ## Notes
