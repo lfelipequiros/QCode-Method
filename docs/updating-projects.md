@@ -47,6 +47,35 @@ This split is the whole safety model. `qcode-sync` only ever re-renders **framew
 > `LAYERS`** block automatically. After a `--write`, re-check the diffs and re-apply any project
 > invariants the update reset. Treat sync as *assisted merge*, not blind overwrite.
 
+## Adopting an existing project (one not scaffolded by QCode)
+
+A project that predates QCode-Method — or the **donor** project the framework was generalized *from* —
+already has the gates, board, and cockpit; you don't re-scaffold it. You **adopt** it by adding one
+file, `.qcode/config.json`, which registers it for updates. Nothing existing is touched.
+
+```json
+{
+  "frameworkVersion": "1.0.0",
+  "adoptedAt": "2026-06-25",
+  "compassCheck": true,
+  "customized": ["record-learnings", "compass-check"],
+  "tokens": { "PROJECT_NAME": "…", "OWNER_NAME": "…", "ACCESS_LAYER": "…", "...": "…" }
+}
+```
+
+- **`tokens`** — the project's real values (read them off its `CLAUDE.md`). Tune them so the
+  framework-owned files that the project did *not* enrich render **identical** to what's there — then a
+  dry-run shows those as up-to-date, and only genuine future framework changes ever surface.
+- **`customized`** — the key insight for a donor/existing project: any framework-owned file the project
+  has **enriched beyond the generic base** (e.g. extra `record-learnings` routing rows, a fuller
+  `compass-check`). Listing it here makes `qcode-sync` treat it as **review-only** — it shows the diff
+  but never overwrites it without `--force`. This is what guarantees adoption loses nothing.
+
+After writing the config, run a dry-run (`node scripts/qcode-sync.mjs <project>`) and confirm the split
+you expect: un-enriched files `up-to-date`, enriched files flagged `customized (review)`, zero writes.
+That output is your baseline. From then on the project updates like any other — just hand-port
+improvements into the `customized` files instead of letting sync overwrite them.
+
 ## Running it
 
 From a current QCode-Method clone:

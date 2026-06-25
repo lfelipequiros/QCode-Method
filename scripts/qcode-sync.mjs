@@ -16,6 +16,12 @@
 // Usage:
 //   node scripts/qcode-sync.mjs <path-to-target-project>            # dry-run: show what would change
 //   node scripts/qcode-sync.mjs <path-to-target-project> --write    # apply updates (with backups)
+//   node scripts/qcode-sync.mjs <path-to-target-project> --write --force   # also overwrite "customized" files
+//
+// Files listed in the project's .qcode/config.json "customized" array (e.g. skills the project has
+// intentionally enriched beyond the generic base) are REVIEW-ONLY: shown as a diff but never written
+// unless --force is given. This is how an existing/donor project (one richer than the templates)
+// adopts the framework for updates without ever risking its enrichments.
 //
 // Zero dependencies. Run from a QCode-Method clone.
 
@@ -30,6 +36,7 @@ const TEMPLATES = join(FRAMEWORK_ROOT, '.claude/skills/qcode-project-scaffolder/
 
 const args = process.argv.slice(2);
 const WRITE = args.includes('--write');
+const FORCE = args.includes('--force');
 const targetArg = args.find((a) => !a.startsWith('--'));
 
 const die = (m) => { console.error(`\n❌ qcode-sync: ${m}\n`); process.exit(1); };
@@ -55,6 +62,7 @@ if (!existsSync(configPath)) die(`no .qcode/config.json in target — was it sca
 const config = JSON.parse(readFileSync(configPath, 'utf8'));
 const tokens = config.tokens || {};
 const compassEnabled = config.compassCheck !== false;
+const customized = config.customized || [];   // file keys the project enriched — never auto-overwritten
 
 info(`\nQCode-Method sync`);
 info(`  framework clone : ${FRAMEWORK_ROOT}  (v${frameworkVersion})`);
@@ -107,7 +115,7 @@ function showDiff(targetFile, rendered) {
   }
 }
 
-let updated = 0, upToDate = 0, missing = 0, skipped = 0;
+let updated = 0, upToDate = 0, missing = 0, skipped = 0, customizedCount = 0;
 
 for (const [tpl, rel] of MANAGED) {
   const tplPath = join(TEMPLATES, tpl);
@@ -134,8 +142,18 @@ for (const [tpl, rel] of MANAGED) {
 
   if (current === rendered) { upToDate++; continue; }
 
+  const isCustomized = customized.some((c) => rel.includes(c));
+  if (isCustomized && !FORCE) {
+    customizedCount++;
+    info(`\n⚠  ${rel}  — CUSTOMIZED (review only; not overwritten without --force)`);
+    info(showDiff(tgtPath, rendered).split('\n').slice(0, 40).map((l) => '   ' + l).join('\n'));
+    info(`   → listed in .qcode/config.json "customized": this project enriched it. Hand-port any genuine`);
+    info(`     framework improvement above into your richer version; don't flatten it.`);
+    continue;
+  }
+
   updated++;
-  info(`\n✎  ${rel}  — framework update available`);
+  info(`\n✎  ${rel}  — framework update available${isCustomized ? '  (FORCED over customized!)' : ''}`);
   info(showDiff(tgtPath, rendered).split('\n').slice(0, 40).map((l) => '   ' + l).join('\n'));
   if (WRITE) {
     copyFileSync(tgtPath, tgtPath + '.qcode-bak');
@@ -151,7 +169,9 @@ function ensureDir(file) {
 
 // ── Summary + version bump ─────────────────────────────────────────────────────────────────────────
 info(`\n────────────────────────────────────────`);
-info(`up-to-date: ${upToDate}  ·  updates: ${updated}  ·  to-add: ${missing}  ·  skipped: ${skipped}`);
+info(`up-to-date: ${upToDate}  ·  updates: ${updated}  ·  to-add: ${missing}  ·  customized (review): ${customizedCount}  ·  skipped: ${skipped}`);
+if (customizedCount > 0 && !FORCE)
+  info(`note: ${customizedCount} customized file(s) shown for review and left untouched. Hand-port improvements; use --force only to deliberately overwrite them.`);
 
 if (WRITE && (updated > 0 || missing > 0)) {
   config.frameworkVersion = frameworkVersion;
