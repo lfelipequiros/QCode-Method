@@ -44,11 +44,26 @@ function walkMarkdownFiles(root) {
   return out;
 }
 
-/** Every tracked `.md` file, repo-relative, POSIX-separated (walks instead, pre-first-commit). */
+/**
+ * Every tracked `.md` file, repo-relative, POSIX-separated (walks instead, pre-first-commit).
+ *
+ * The fallback condition is "git has nothing to say," not "no .git directory" — `git init` alone
+ * leaves a real `.git` directory with `git ls-files` still returning nothing, since nothing has
+ * been staged or committed yet. Trusting that empty answer at face value would silently check ZERO
+ * files and report "all resolve" regardless of whether real dead links exist — worse than the
+ * missing-repo case, because it fails quiet instead of loud. A QCode-Method project always has
+ * several tracked `.md` files (CLAUDE.md, the board, the backlog) once it has any history at all,
+ * so "git tracks zero markdown files" is treated as "nothing to trust yet" uniformly, whether the
+ * cause is no repo, or a repo with no first commit.
+ */
 export function trackedMarkdownFiles(root = ROOT) {
-  if (!existsSync(join(root, '.git'))) return walkMarkdownFiles(root);
-  const out = execFileSync('git', ['ls-files', '--', '*.md'], { cwd: root, encoding: 'utf8' });
-  return out.split('\n').filter(Boolean);
+  if (existsSync(join(root, '.git'))) {
+    const out = execFileSync('git', ['ls-files', '--', '*.md'], { cwd: root, encoding: 'utf8' })
+      .split('\n')
+      .filter(Boolean);
+    if (out.length) return out;
+  }
+  return walkMarkdownFiles(root);
 }
 
 // `[text](target)` — not a full CommonMark parser, deliberately: this only needs to find
@@ -125,10 +140,16 @@ export function checkLinks(root = ROOT, files = trackedMarkdownFiles(root)) {
       }
       if (inFence) return;
 
-      // Strip inline `single-backtick spans` before matching — the same reasoning as the fence
-      // skip, one level down: `[<id>](<id>.md)` shown as an illustrative inline example (e.g. "add
-      // a row shaped like `| [<id>](<id>.md) | title |`") is documentation text, not a real link.
-      const lineText = rawLine.replace(/`[^`]*`/g, '');
+      // Strip inline code spans before matching — the same reasoning as the fence skip, one level
+      // down: `[<id>](<id>.md)` shown as an illustrative inline example (e.g. "add a row shaped
+      // like `| [<id>](<id>.md) | title |`") is documentation text, not a real link. Double
+      // backticks FIRST, then single: CommonMark's own escape for "literal backtick(s) inside a
+      // code span" is a longer delimiter (`` `like this` ``), and stripping single-backtick spans
+      // first would misparse the double-backtick's own opening pair as one empty single span,
+      // leaving a fragment like `[skill-name](../path)` looking like a real, checkable link.
+      const lineText = rawLine
+        .replace(/``[^`]*(?:`[^`]*)*``/g, '')
+        .replace(/`[^`]*`/g, '');
 
       LINK_RE.lastIndex = 0;
       let m;

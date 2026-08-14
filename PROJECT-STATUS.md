@@ -13,14 +13,15 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 
 **Updated:** 2026-08-14 · **Phase:** Building (epic 05) · **Branch:** `v2-extraction`
 
-- **Last shipped:** [05.1](backlog/epic-05-generation-engine.md#051--the-unified-renderer-core) —
-  `lib/qcode-core.mjs`: the shared resolver, token substitution (including the whole-line-empty-token
-  fix), diff/backup, `customized[]` protection, and package.json merge, all exported for 05.2–05.4 to
-  import. Its own end-to-end test found and fixed four real bugs: `check-links.mjs` crashing on a
-  pre-first-commit project, two illustrative-example false positives, an unconditional link to
-  optional `compass-check`, and a genuinely missing story heading in this very backlog.
-- **Next up:** `05.2` — `generate` mode: the CLI that asks only for static identity, renders the
-  whole tree via `lib/qcode-core.mjs`, and self-tests before reporting success (the C7 fix).
+- **Last shipped:** [05.2](backlog/epic-05-generation-engine.md#052--generate-mode--the-scaffold) —
+  `qcode.mjs generate`: five static-identity questions (flags, `--config`, or an interactive
+  prompt), every judgment token left as an honest `(to define: … charter pass)` gap, self-tests
+  before declaring success. Five real end-to-end runs (not just unit tests) found and fixed three
+  more real bugs in shared infrastructure: a `business-context.md` render gap, a silent false-pass
+  in `check-links.mjs` on a git-init-but-uncommitted project, and a CommonMark double-backtick
+  escape it didn't understand. 40 tests total in `lib/`.
+- **Next up:** `05.3` — the `qcode-charter` skill: the AI half of bootstrapping, interviewing for
+  the judgment `generate` deliberately skipped and resolving every gap it left behind.
 
 ## Epics
 
@@ -40,12 +41,13 @@ the story in its epic.
 
 | Story | Status | Link |
 |-------|--------|------|
-| 05.2 | `in-progress` | [epic-05 § 05.2](backlog/epic-05-generation-engine.md#052--generate-mode--the-scaffold) |
+| 05.3 | `in-progress` | [epic-05 § 05.3](backlog/epic-05-generation-engine.md#053--qcode-charter-skill--the-charter) |
 
 ## Recently done — the increment log
 
 | Story | Date | Detail |
 |-------|------|--------|
+| 05.2 | 2026-08-14 | [epic-05 § 05.2](backlog/epic-05-generation-engine.md#052--generate-mode--the-scaffold) — qcode.mjs generate, 3 more real bugs found and fixed, 40 tests total |
 | 05.1 | 2026-08-14 | [epic-05 § 05.1](backlog/epic-05-generation-engine.md#051--the-unified-renderer-core) — lib/qcode-core.mjs, 35 tests, 4 real bugs found and fixed |
 | 04.1 | 2026-08-14 | [epic-04 § 04.1](backlog/epic-04-product-layer.md#041--generalize-product-check--its-trackers) — product-check generalized, PDR log + surface map shipped |
 | 03.4 | 2026-08-14 | [epic-03 § 03.4](backlog/epic-03-the-gates.md#034--compass-check--record-learnings-reconciliation) — ACCEPTED.md + board:check in the reconcile, repo-only memory, C9 write boundaries |
