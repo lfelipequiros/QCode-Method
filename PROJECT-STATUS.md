@@ -13,12 +13,13 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 
 **Updated:** 2026-08-14 · **Phase:** Building (epic 03) · **Branch:** `v2-extraction`
 
-- **Last shipped:** [03.1](backlog/epic-03-the-gates.md#031--tech-planning-rewrite) — `tech-planning`
-  now carries story-as-file placement, the four-lane finding taxonomy, the ADR bridge (with an
-  inline fallback for when the vendor `architecture` skill isn't installed), and the
-  one-branch-per-story delivery contract. Kept the surgical spec-loading step (R3) intact.
-- **Next up:** `03.2` — the `tech-build` rewrite: branch binding, a fourth divergence lane (Design
-  decision, distinct from a forced shortcut), and the auto-deliver-on-green PR step.
+- **Last shipped:** [03.2](backlog/epic-03-the-gates.md#032--tech-build-rewrite) — `tech-build` now
+  binds to the story's one branch at Step 1, carries a fourth divergence lane (Design decision,
+  distinct from a forced shortcut — hands back to `tech-planning`'s ADR bridge), and auto-delivers
+  on green (commit, push, open the story's single PR, no menu).
+- **Next up:** `03.3` — the `tech-qa` rewrite: numbered QA rounds, the three-place close (delete the
+  board row → append to `CLOSED.md` → narrate on the story file), and merge authority (the only
+  gate that merges, on PASS).
 
 ## Epics
 
@@ -38,12 +39,13 @@ the story in its epic.
 
 | Story | Status | Link |
 |-------|--------|------|
-| 03.2 | `in-progress` | [epic-03 § 03.2](backlog/epic-03-the-gates.md#032--tech-build-rewrite) |
+| 03.3 | `in-progress` | [epic-03 § 03.3](backlog/epic-03-the-gates.md#033--tech-qa-rewrite) |
 
 ## Recently done — the increment log
 
 | Story | Date | Detail |
 |-------|------|--------|
+| 03.2 | 2026-08-14 | [epic-03 § 03.2](backlog/epic-03-the-gates.md#032--tech-build-rewrite) — branch binding, 4th divergence lane, deliver/PR step |
 | 03.1 | 2026-08-14 | [epic-03 § 03.1](backlog/epic-03-the-gates.md#031--tech-planning-rewrite) — story-as-file, four-lane routing, ADR bridge, branch contract |
 | 02.4 | 2026-08-14 | [epic-02 § 02.4](backlog/epic-02-shape-and-enforcement.md#024--cockpit-evolution) — cockpit imports board-check's parsers, done/in-progress/flagged verified with synthetic data |
 | 02.3 | 2026-08-14 | [epic-02 § 02.3](backlog/epic-02-shape-and-enforcement.md#023--rebuild-the-guard-as-a-shared-predicate) — status-guard.sh, check-links.mjs, index-backlog.mjs, CI template |

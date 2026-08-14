@@ -80,6 +80,21 @@ correctly once scaffolded, not from their current location in this framework rep
 verification for this file happens at the day-one acceptance test (06.2), which scaffolds an actual
 project and checks *that* tree — not here.
 
+#### Closed: 03.2 — 2026-08-14
+
+Built directly. Structurally self-checked: frontmatter parses; all four house tokens preserved
+(`{{ACCESS_LAYER}}`, `{{TENANCY}}`, `{{HOUSE_STANDARDS}}`, `{{TYPED_RESULT_NAME}}`); the divergence
+protocol carries exactly four bullets (better-than-planned / forced-shortcut / design-decision /
+scope-change), confirmed by direct count rather than assumed from the diff; the design-decision
+lane correctly cross-references `tech-planning`'s ADR bridge by name, matching the actual section
+heading 03.1 wrote rather than a paraphrase of it.
+
+Added one thing beyond the story's literal file list: a one-line pointer to the (not-yet-written)
+nested-`CLAUDE.md` precedence section in Step 3, since a multi-app project's build step needs to
+know that app's own conventions apply on top of this gate. This is a forward reference to 06.1 (the
+same kind 03.1 already carries for `skills-lock.json`) — resolved once that section exists, not a
+defect now.
+
 ### 03.2 — `tech-build` rewrite
 
 **What & why.** The build gate binds to the story's one branch (never opens a second), auto-delivers
