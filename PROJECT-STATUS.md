@@ -13,15 +13,12 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 
 **Updated:** 2026-08-14 · **Phase:** Building (epic 03) · **Branch:** `v2-extraction`
 
-- **Last shipped:** [02.4](backlog/epic-02-shape-and-enforcement.md#024--cockpit-evolution) —
-  the cockpit now imports its table parsers from `board-check.mjs` (not just the vocabulary),
-  renders flagged/done/in-progress correctly (verified with synthetic data, not just the
-  fresh-scaffold path), and a full test-suite re-run caught a real regression in a 02.2 test that
-  had started silently depending on 02.3's new file. **This closes epic 02** — the ADR-059 shape is
-  now written, machine-checked, enforced, and visualized.
-- **Next up:** `03.1` — the `tech-planning` rewrite: story-as-file placement, the four-lane finding
-  taxonomy, the ADR bridge (with a fallback for when the vendor `architecture` skill isn't
-  installed), and the one-branch-per-story delivery contract.
+- **Last shipped:** [03.1](backlog/epic-03-the-gates.md#031--tech-planning-rewrite) — `tech-planning`
+  now carries story-as-file placement, the four-lane finding taxonomy, the ADR bridge (with an
+  inline fallback for when the vendor `architecture` skill isn't installed), and the
+  one-branch-per-story delivery contract. Kept the surgical spec-loading step (R3) intact.
+- **Next up:** `03.2` — the `tech-build` rewrite: branch binding, a fourth divergence lane (Design
+  decision, distinct from a forced shortcut), and the auto-deliver-on-green PR step.
 
 ## Epics
 
@@ -41,12 +38,13 @@ the story in its epic.
 
 | Story | Status | Link |
 |-------|--------|------|
-| 03.1 | `in-progress` | [epic-03 § 03.1](backlog/epic-03-the-gates.md#031--tech-planning-rewrite) |
+| 03.2 | `in-progress` | [epic-03 § 03.2](backlog/epic-03-the-gates.md#032--tech-build-rewrite) |
 
 ## Recently done — the increment log
 
 | Story | Date | Detail |
 |-------|------|--------|
+| 03.1 | 2026-08-14 | [epic-03 § 03.1](backlog/epic-03-the-gates.md#031--tech-planning-rewrite) — story-as-file, four-lane routing, ADR bridge, branch contract |
 | 02.4 | 2026-08-14 | [epic-02 § 02.4](backlog/epic-02-shape-and-enforcement.md#024--cockpit-evolution) — cockpit imports board-check's parsers, done/in-progress/flagged verified with synthetic data |
 | 02.3 | 2026-08-14 | [epic-02 § 02.3](backlog/epic-02-shape-and-enforcement.md#023--rebuild-the-guard-as-a-shared-predicate) — status-guard.sh, check-links.mjs, index-backlog.mjs, CI template |
 | 02.2 | 2026-08-13 | [epic-02 § 02.2](backlog/epic-02-shape-and-enforcement.md#022--port-board-checkmjs--fixture-tests) — board-check.mjs, 7 rules, 39 tests |

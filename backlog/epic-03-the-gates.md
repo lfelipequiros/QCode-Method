@@ -55,6 +55,31 @@ surgical spec-loading step, which Mompa itself now needs back (R3).
 - The ADR-bridge fallback path is explicit, not merely implied by "if installed."
 - `check:links` (once 02.3 ships) is green against this file.
 
+#### Closed: 03.1 — 2026-08-14
+
+Built directly by the orchestrating session. Self-checked structurally rather than by execution
+(this is a documentation/skill file, not runnable code — the verification that matters is internal
+consistency, not a test suite):
+
+- Frontmatter parses (exactly 2 `---` delimiters), all `{{TOKEN}}` placeholders preserved correctly
+  in their new locations (`{{VALUE_ARCHETYPES}}`, `{{TENANCY}}`, `{{ACCESS_LAYER}}`,
+  `{{DECISION_AXES}}`), no leftover unsubstituted artifacts beyond intentional illustrative
+  placeholders (`<id>`, `<NN.M>`, `ADR-0NN` — all inside code-fenced examples, not real tokens).
+- The old `## Logging tech-debt` section and its step-5 "log any debt" framing are fully replaced
+  by the four-lane routing table — grepped to confirm no orphaned duplicate remains.
+- All internal links point at paths consistent with the existing `../../../` convention; one NEW
+  reference was added (`skills-lock.json`, for the ADR bridge's vendor-skill detection) — that file
+  doesn't exist yet (ships in 06.2). This is a forward reference of the same kind 03.4 already
+  carries for `product-check`'s routing row: tracked, not a defect, resolved by the time 06.2 lands
+  since that story was already going to create the file regardless.
+
+**A scope note, not a defect.** The story's own acceptance criteria say "`check:links` green against
+this file" — but every `../../../`-style link in every gate template is a known, already-documented
+non-issue when checked from *inside* `assets/templates/` (see 02.3's closure): those paths resolve
+correctly once scaffolded, not from their current location in this framework repo. Real link
+verification for this file happens at the day-one acceptance test (06.2), which scaffolds an actual
+project and checks *that* tree — not here.
+
 ### 03.2 — `tech-build` rewrite
 
 **What & why.** The build gate binds to the story's one branch (never opens a second), auto-delivers
