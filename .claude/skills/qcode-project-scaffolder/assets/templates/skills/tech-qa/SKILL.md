@@ -35,6 +35,12 @@ checking against. No story? The work skipped the gates — flag it and route bac
 
 ## Phase 1 — Compliance review (is the code right?)
 
+> **Run this gate in a fresh context.** QA is the *independent* pass — independence is cheaper and
+> more honest from a clean session: load the story + the PR diff, not the build transcript.
+> Run the built-in `code-review` at **medium** effort for routine increments (high/xhigh only for
+> high-stakes or architecture-heavy diffs); `verify` only when the diff has a runtime surface;
+> `security-review` only for auth/secrets/webhooks/payments diffs (as already scoped below).
+
 A static pass over the diff. Use the engine, then add the layer it doesn't know:
 
 1. **Run the built-in `code-review`** for correctness bugs and reuse/simplification/efficiency

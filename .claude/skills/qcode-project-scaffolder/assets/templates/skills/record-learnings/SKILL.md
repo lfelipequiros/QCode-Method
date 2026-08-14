@@ -34,6 +34,14 @@ it's a separate, on-demand tool for specific topics (see "Not `handoff`" below),
 step. *If* you do also write a handoff for the session, run this sweep first so the handoff can link to
 the ADR/debt rows it created (see [`CLAUDE.md`](../../../CLAUDE.md) §7).
 
+**Run it cheap.** This sweep is designed to work from *evidence* (git log, the diff, the live
+docs), not from the chat transcript — so its natural home is a **fresh session** (or right after
+`/clear`), pointed at `git log <last-sweep>..HEAD`. Don't run it at the tail of a long build
+session where every turn re-reads the whole transcript. Cadence: sweep **per epic** (or when a
+hard-won lesson / new ADR / new debt obviously appeared) rather than mechanically per story — a
+story whose gates already filed everything is the designed no-op, and batching three no-op sweeps
+into one costs a third as much.
+
 ## What this skill is NOT
 
 - **Not `handoff`.** Handoff writes the session *narrative + open threads* into one journal file, and

@@ -111,6 +111,19 @@ implementation only after approval.
   every story. When you do write one, run `record-learnings` first so the handoff can link to what it
   filed.
 - **Value lens always on:** when proposing anything, name which value archetype it serves.
+- **Token discipline — one stage, one session, right-sized model.** The story file, the board, and
+  the trackers are the durable state; the chat transcript is disposable. Exploit that: run each
+  lifecycle stage in a fresh context (`/clear` between stages) instead of one marathon session —
+  plan in one session, build in a fresh one bound to the approved story, QA in a fresh one against
+  the PR diff, and sweep learnings in a fresh one anchored to `git log`/diff. Never let a working
+  session grow past ~150K context (the cost of every later turn scales with everything before it).
+  Default models per stage on **{{CLAUDE_PLAN}}**: the plan's cheapest capable model for tech-build,
+  record-learnings, compass-check, handoff, and ad-hoc work; the plan's top-tier model for
+  tech-planning judgment and the tech-qa / code-review pass on high-stakes or architecture-heavy
+  stories; the most expensive/frontier model **only by explicit, named exception** — never a
+  routine-gate default. Default effort **medium**; raise only for the build/QA of complex increments.
+  *(to define: fill `{{CLAUDE_PLAN}}` during foundation — Pro/Max-5x/Max-20x/API — it changes how
+  aggressively this trade-off matters.)*
 
 ---
 

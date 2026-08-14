@@ -42,6 +42,19 @@ It is the navigator, not the engine.
   job is to know *when to pull them in* and *flag when the work is drifting from them*, not to
   duplicate them. See "Defer, don't duplicate."
 
+## Two depths — default to lite
+
+- **Lite check (default, most invocations):** read `business-context.md`, PROJECT-STATUS's *Next*
+  + *Active increments* sections, and scan TECH-DEBT.md **only for `open` items whose trigger
+  plausibly fired** since the board's *Updated* date. Answer the "what now?" question from that.
+  Skip the full backlog/ASD/handoff/git sweep below.
+- **Full sweep (on demand or on cadence):** the complete Step 1 load. Run it only when
+  (a) {{OWNER_NAME}} explicitly asks for a health-check / full review, (b) an **epic** is starting or
+  closing, or (c) the lite check surfaced a contradiction it can't resolve.
+- **Cadence:** compass-check is an epic-boundary and "lost the thread" tool — not a per-story
+  ritual. Between stories inside an approved epic, the sequenced backlog already answers "what
+  next"; don't re-derive it.
+
 ## Boundaries (so this stays the conscience, not an everything-skill)
 
 - **vs the gates** — `tech-planning`/`build`/`qa` answer *"how do I build this chosen thing?"*

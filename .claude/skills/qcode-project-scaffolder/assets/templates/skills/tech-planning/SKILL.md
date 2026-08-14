@@ -37,11 +37,15 @@ you're unsure whether something is "real code," it is — run the gate.
 
 ## The process
 
-1. **Load the relevant spec.** Start from [`../../../README.md`](../../../README.md) and open the
-   architecture files the task touches. Always re-read; the ASD is the source of truth and it changes.
-   At minimum skim: the relevant `architecture/` file(s), the matching `backlog/epic-0X` if one
-   exists, the root [`CLAUDE.md`](../../../CLAUDE.md) (value model, house standards), and
-   [`../../../OPEN-QUESTIONS.md`](../../../OPEN-QUESTIONS.md).
+1. **Load the relevant spec — surgically.** [`CLAUDE.md`](../../../CLAUDE.md) is already in context
+   (never re-read it). Open only: the `architecture/` file(s) the task actually touches, the matching
+   `backlog/epic-0X` story section, and
+   [`../../../OPEN-QUESTIONS.md`](../../../OPEN-QUESTIONS.md). For the ADR ledger, **Grep the
+   specific ADRs the story touches** (by seam/topic) instead of reading
+   [`architecture/01-principles-and-decisions.md`](../../../architecture/01-principles-and-decisions.md)
+   wholesale — cite what you actually loaded. From [`PROJECT-STATUS.md`](../../../PROJECT-STATUS.md)
+   read only the epic table + *Active increments* (not the history — archive it once the "Recently
+   done" log grows long).
 2. **Place the work.** If it advances an existing epic, **append the story to that epic file**. If it
    fits none, append to **[`backlog/08-adhoc.md`](../../../backlog/08-adhoc.md)**. Never invent a
    parallel planning system. **Register it on the board** — add/confirm the epic in

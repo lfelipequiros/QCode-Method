@@ -68,29 +68,33 @@ the rest. Don't over-ask — offer sensible defaults (shown) and accept them.
    `{{DOMAIN_SUMMARY}}` (what it does, for whom).
 2. **People** — `{{TEAM_CONTEXT}}` (solo? a small team? who consumes the output?), and `{{OWNER_NAME}}`
    (who holds the wheel — used by compass-check if enabled; default "the owner").
-3. **Value model** — `{{VALUE_ARCHETYPES}}`: the 1–3 ways this project creates value (the generalized
+3. **Claude plan** — `{{CLAUDE_PLAN}}`: which Claude plan runs this project (Pro / Max 5x / Max 20x /
+   API pay-per-token)? Feeds the CLAUDE.md §7 token-discipline defaults (model-per-stage, session
+   hygiene) — a Pro-plan project needs those defaults enforced much more aggressively than an
+   API/Max-20x one. *Default:* "Pro" if unsure.
+4. **Value model** — `{{VALUE_ARCHETYPES}}`: the 1–3 ways this project creates value (the generalized
    ROI lens). *Default offered:* "replace/avoid a cost · prevent a loss · enable downstream value."
    And `{{DECISION_AXES}}` — *default:* "Confidence · Time-to-market · Reliability · ROI."
-4. **Stack** — `{{STACK_HOSTING}}`, `{{STACK_FRONTEND}}`, `{{STACK_BACKEND}}`, `{{STACK_DATA}}`,
+5. **Stack** — `{{STACK_HOSTING}}`, `{{STACK_FRONTEND}}`, `{{STACK_BACKEND}}`, `{{STACK_DATA}}`,
    `{{STACK_AI}}` (any "none" is fine).
-5. **Architecture** — is there a layered/seam shape? If yes, capture `{{ARCHITECTURE_OVERVIEW}}`
+6. **Architecture** — is there a layered/seam shape? If yes, capture `{{ARCHITECTURE_OVERVIEW}}`
    (the layers + the seams that hold them apart). If it's not settled, leave the architecture seams as
    a `(to define)` gap. Also: multi-tenant? → `{{TENANCY}}` = the tenant key name (e.g. `tenant_id`)
    or "single-tenant."
-6. **House standards** — `{{HOUSE_STANDARDS}}`. *Default offered:* a typed result wrapper
+7. **House standards** — `{{HOUSE_STANDARDS}}`. *Default offered:* a typed result wrapper
    (`{{TYPED_RESULT_NAME}}`, default `Result<T>`), schema validation at boundaries, strict types,
    structured/prefixed logs, "no schema change without the matching data-access update."
-7. **Data-access seam** — does the project read data through a typed package? → `{{ACCESS_LAYER}}`
+8. **Data-access seam** — does the project read data through a typed package? → `{{ACCESS_LAYER}}`
    (e.g. `@{{PROJECT_SLUG}}/data`) or "n/a." If undecided, `(to define)`.
-8. **Roadmap** — at least Epic 01 (Foundation). For each epic beyond Foundation capture its number,
+9. **Roadmap** — at least Epic 01 (Foundation). For each epic beyond Foundation capture its number,
    name, one-line outcome, value archetype, and dependency, then render the rows into **both** epic
    tables from the same data: `{{EPIC_TABLE}}` (the board format in `PROJECT-STATUS.md` — `Status /
    Detail` columns) and `{{EPIC_TABLE_ROADMAP}}` (the roadmap format in `backlog/00-roadmap.md` —
    `Outcome / Value archetype / Depends on` columns). *Default:* Foundation only → both tokens render
    to empty (the `(to define)` gap below each table covers epics 02+).
-9. **Strategic advisor** — install the optional **`compass-check`** skill (a read-only CTO-conscience
-   that sits above the gates and advises on direction)? *(yes/no — default yes.)*
-10. **Git** — initialize the repo + install the status-guard hook now? (yes/no)
+10. **Strategic advisor** — install the optional **`compass-check`** skill (a read-only CTO-conscience
+    that sits above the gates and advises on direction)? *(yes/no — default yes.)*
+11. **Git** — initialize the repo + install the status-guard hook now? (yes/no)
 
 Echo the resolved values back before generating, so the user can correct them. Resolve `{{TODAY}}`
 (ISO date) and `{{FRAMEWORK_VERSION}}` (read from the `VERSION` file in this skill folder) at
@@ -143,7 +147,7 @@ framework updates without clobbering project-owned files:
   "compassCheck": <true|false from Q9>,
   "tokens": {
     "PROJECT_NAME": "…", "PROJECT_SLUG": "…", "ONE_LINER": "…", "OWNER_NAME": "…",
-    "TEAM_CONTEXT": "…", "VALUE_ARCHETYPES": "…", "DECISION_AXES": "…",
+    "TEAM_CONTEXT": "…", "CLAUDE_PLAN": "…", "VALUE_ARCHETYPES": "…", "DECISION_AXES": "…",
     "STACK_HOSTING": "…", "STACK_FRONTEND": "…", "STACK_BACKEND": "…",
     "STACK_DATA": "…", "STACK_AI": "…", "TENANCY": "…",
     "TYPED_RESULT_NAME": "…", "ACCESS_LAYER": "…"
