@@ -194,6 +194,47 @@ rule 5 to report dead links as a known artifact, not a regression.
 table — they'd have been silently skipped by anyone following that table literally. Added now,
 alongside this story's own new rows.
 
+#### Closed: 02.4 — 2026-08-14
+
+Built directly by the orchestrating session (continuing the pattern from 02.3, since a second
+subagent dispatch risked hitting the same spend limit for no benefit — the spec was already fully
+worked out).
+
+**Beyond scope, in a good way.** The story only asked for importing `status-vocab.mjs`; the
+rewrite also imports `tableRows`, `cells`, `extractId`, `parseActive`, and `parseClosed` directly
+from `board-check.mjs` rather than reimplementing table parsing a second time. That closes more of
+the "two readers can disagree" risk class than C1 originally scoped — table-row parsing, not just
+the status vocabulary, is now genuinely one implementation shared by the checker and the renderer.
+
+**Real verification, exercising paths a fresh scaffold never touches.** A clean run against the
+templates' own board confirmed the day-one case (2 epics, 5 stories, all `planned`, 0 flagged,
+`flaggedCount: 0` — proving the C3 fix: an empty-but-present `CLOSED.md` renders correctly rather
+than crashing). That alone doesn't prove `done`/`in-progress`/flagged detection actually work,
+since nothing in a fresh scaffold exercises those branches — so a synthetic pass injected one
+`CLOSED.md` row, one Active-increments row, and one Needs-status-review row into backed-up copies
+of the real templates, confirming: the closed story renders `done`, the active one renders
+`in-progress` (with the epic rollup correctly computing `progress: 0.2`, `done: 1`, `total: 5`),
+and the flagged one renders `flagged: true` while keeping its own claimed status — flagging is an
+overlay, not a status replacement, and the model output confirmed both survive independently. Both
+files were restored from backup and the test artifacts discarded; `git status` showed zero residue
+before proceeding.
+
+**A real regression found by re-running the full suite, not assumed clean.** 02.2's test "reports
+'not yet wired' when check-links.mjs is absent" called `rule5_linksResolve()` with no override,
+depending on check-links.mjs genuinely not existing yet *in the real tree* at the time it was
+written. Once 02.3 added `check-links.mjs` for real, that same call started exercising the *found*
+branch instead — executing the real script against `assets/templates/` and hitting the already-
+documented templates-vs-final-path dead-link artifact, which turned an unrelated test red. Fixed by
+switching the test to the same dependency-injection pattern its sibling cases already use
+(`{ scriptPath: join(ROOT, 'scripts', '__never-created__.mjs') }`), so it tests the *condition* it
+names regardless of what else has shipped by the time it runs — and added `ROOT` to the test
+file's own import list, which the fix needed and hadn't been imported before. Full suite re-run
+clean afterward: 39/39.
+
+**Epic 02 closes with this story.** The ADR-059 shape (02.1) is now machine-checked
+(02.2), enforced at commit and CI time (02.3), and visualized (02.4) — every piece self-tested
+against the real templates tree, not just reviewed.
+
 #### Closed: 02.2 — 2026-08-13
 
 Built by subagent, independently re-verified by the orchestrating session (re-ran

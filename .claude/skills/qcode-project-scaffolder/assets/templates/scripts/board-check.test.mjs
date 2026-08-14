@@ -17,6 +17,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  ROOT,
   rule1_noIdOpenAndClosed,
   rule2_idsResolve,
   rule3_statusCellIsAToken,
@@ -158,9 +159,13 @@ describe('rule 4 — the status vocabulary is closed (checked after alias resolu
 
 describe('rule 5 — delegates link-checking to check-links.mjs rather than reimplementing it', () => {
   it('reports "not yet wired" (no violation) when check-links.mjs is absent', () => {
-    // check-links.mjs genuinely does not exist yet in this repo — it ships in the next story,
-    // 02.3. This exercises the real, current behavior rather than a simulation of it.
-    const result = rule5_linksResolve();
+    // Dependency-injected at a guaranteed-nonexistent path — check-links.mjs genuinely does
+    // NOT exist ambiently as of story 02.2, but story 02.3 (the very next one) adds it for
+    // real, at which point calling rule5_linksResolve() with no override would exercise the
+    // *found* branch instead of this one. Point scriptPath somewhere that can never exist
+    // rather than depending on the ambient state of the real tree, so this test keeps meaning
+    // what it says regardless of what else has shipped by the time it runs.
+    const result = rule5_linksResolve({ scriptPath: join(ROOT, 'scripts', '__never-created__.mjs') });
     assert.equal(result.violations.length, 0);
     assert.match(result.note, /not yet wired/);
   });

@@ -11,23 +11,25 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 > subject (see [05.4](backlog/epic-05-generation-engine.md#054--migrate--check-modes)) — proving
 > the v1→v2 path on itself before it's ever run against a consumer project.
 
-**Updated:** 2026-08-14 · **Phase:** Building (epic 02) · **Branch:** `v2-extraction`
+**Updated:** 2026-08-14 · **Phase:** Building (epic 03) · **Branch:** `v2-extraction`
 
-- **Last shipped:** [02.3](backlog/epic-02-shape-and-enforcement.md#023--rebuild-the-guard-as-a-shared-predicate) —
-  `status-guard.sh` (rule 0 NUL/CRLF, rule 7 status-event), `check-links.mjs`, `index-backlog.mjs`,
-  and the CI workflow template, all wired to the same predicate as the local hook. Built directly
-  after a subagent hit a spend limit before writing anything; found and fixed a real slugify bug
-  (GitHub anchors don't collapse multi-space runs) along the way.
-- **Next up:** `02.4` — the cockpit, closing epic 02. Imports `status-vocab.mjs` (C1), distinguishes
-  an absent `CLOSED.md` from an empty one (C3), and renders *Needs status review* rows red.
+- **Last shipped:** [02.4](backlog/epic-02-shape-and-enforcement.md#024--cockpit-evolution) —
+  the cockpit now imports its table parsers from `board-check.mjs` (not just the vocabulary),
+  renders flagged/done/in-progress correctly (verified with synthetic data, not just the
+  fresh-scaffold path), and a full test-suite re-run caught a real regression in a 02.2 test that
+  had started silently depending on 02.3's new file. **This closes epic 02** — the ADR-059 shape is
+  now written, machine-checked, enforced, and visualized.
+- **Next up:** `03.1` — the `tech-planning` rewrite: story-as-file placement, the four-lane finding
+  taxonomy, the ADR bridge (with a fallback for when the vendor `architecture` skill isn't
+  installed), and the one-branch-per-story delivery contract.
 
 ## Epics
 
 | # | Epic | Status | Detail |
 |---|------|--------|--------|
 | 01 | Secure the base, stand up the board | `done` | [epic-01](backlog/epic-01-secure-base.md) |
-| 02 | The shape and its enforcement | `in-progress` | [epic-02](backlog/epic-02-shape-and-enforcement.md) |
-| 03 | The gates | `planned` | [epic-03](backlog/epic-03-the-gates.md) |
+| 02 | The shape and its enforcement | `done` | [epic-02](backlog/epic-02-shape-and-enforcement.md) |
+| 03 | The gates | `in-progress` | [epic-03](backlog/epic-03-the-gates.md) |
 | 04 | The product layer | `planned` | [epic-04](backlog/epic-04-product-layer.md) |
 | 05 | The generation engine | `planned` | [epic-05](backlog/epic-05-generation-engine.md) |
 | 06 | Assembly & release | `planned` | [epic-06](backlog/epic-06-assembly-and-release.md) |
@@ -39,12 +41,13 @@ the story in its epic.
 
 | Story | Status | Link |
 |-------|--------|------|
-| 02.4 | `in-progress` | [epic-02 § 02.4](backlog/epic-02-shape-and-enforcement.md#024--cockpit-evolution) |
+| 03.1 | `in-progress` | [epic-03 § 03.1](backlog/epic-03-the-gates.md#031--tech-planning-rewrite) |
 
 ## Recently done — the increment log
 
 | Story | Date | Detail |
 |-------|------|--------|
+| 02.4 | 2026-08-14 | [epic-02 § 02.4](backlog/epic-02-shape-and-enforcement.md#024--cockpit-evolution) — cockpit imports board-check's parsers, done/in-progress/flagged verified with synthetic data |
 | 02.3 | 2026-08-14 | [epic-02 § 02.3](backlog/epic-02-shape-and-enforcement.md#023--rebuild-the-guard-as-a-shared-predicate) — status-guard.sh, check-links.mjs, index-backlog.mjs, CI template |
 | 02.2 | 2026-08-13 | [epic-02 § 02.2](backlog/epic-02-shape-and-enforcement.md#022--port-board-checkmjs--fixture-tests) — board-check.mjs, 7 rules, 39 tests |
 | 02.1 | 2026-08-13 | [epic-02 § 02.1](backlog/epic-02-shape-and-enforcement.md#021--information-architecture-the-adr-059-shape) — the ADR-059 shape in the scaffolder templates |
