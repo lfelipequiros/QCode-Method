@@ -150,6 +150,50 @@ Also fixed at QA time: `00-roadmap.md`'s Foundation row had no markdown link at 
 original (contrary to the file's own stated promise) — the subagent added one rather than
 "repointing" something that never existed, which is the more correct read of the intent.
 
+#### Closed: 02.3 — 2026-08-14
+
+**Built directly by the orchestrating session, not a subagent.** The subagent dispatched for this
+story hit a monthly spend-limit error before writing any files (confirmed via `git status` — clean
+working tree). Rather than retry a call likely to hit the same wall, the story was implemented
+directly from the same detailed spec that would have gone to the subagent, then verified the same
+way every prior story was: real runs, not just review.
+
+**Real verification performed, not just review:**
+- `sh -n` on both `status-guard.sh` and `pre-commit` — clean parse.
+- Rule 7 tested with synthetic `name-status` input for both cases that matter: an *existing* story
+  file modified with no board change (exit 0 — the fix over the old write-proxy guard) and a *new*
+  story file added with no board change (exit 1, with the exact violation message). Both confirmed
+  by direct output, not inferred.
+- `index-backlog.mjs` tested in both modes against the real templates tree: `--check` correctly
+  reports all 5 existing stories indexed; a scratch `01.6.md` story was created, indexed, confirmed
+  via `git diff --numstat` to be a pure `1 0` insertion (matching the additive-only contract) with
+  the actual diff reviewed, then the scratch file and index row were fully reverted.
+- `check-links.mjs` found a real bug in its own first draft: `slugify()` collapsed runs of
+  whitespace into a single hyphen, which doesn't match GitHub's actual anchor algorithm — a heading
+  with an em-dash (`Foo — Bar`) really anchors as `foo--bar` (double hyphen; the dash is dropped,
+  both surrounding spaces survive and each becomes its own hyphen) rather than `foo-bar`. Caught by
+  running the checker against this repo's own root (not `assets/templates/` — see below) and seeing
+  the hand-authored anchors in 02.1/02.2's own `PROJECT-STATUS.md` reported as dead. Verified the
+  fix against the literal heading text before and after; re-ran against the real tree: 0 dead links
+  across all 16 tracked files, confirming both the fix and the health of this repo's own board.
+
+**A structural non-issue, documented rather than "fixed."** Running `check-links.mjs` or
+`board-check.mjs`'s rule 5 *from inside* `assets/templates/` reports ~47 dead links / a rule-5
+failure — every one of them a `../../../PROJECT-STATUS.md`-style path in a gate `SKILL.md`. These
+are correct once scaffolded (the path resolves from a real project's `.claude/skills/.../SKILL.md`
+to its own root) and are artifacts of reading a template file from its *current* location in this
+framework repo rather than its *destination* in a scaffolded one — the same reason Mompa's own
+`check-links.mjs` explicitly excludes its embedded scaffolder templates from its own scan. No
+template content was changed to chase this: real end-to-end link verification belongs to the
+day-one acceptance test (06.2), which scaffolds an actual project and checks *that* tree. Any
+future story self-testing `board-check`/`check-links` from within `assets/templates/` should expect
+rule 5 to report dead links as a known artifact, not a regression.
+
+**Also closed a gap from 02.2:** its files (`board-check.mjs`, `status-vocab.mjs`,
+`board-check.test.mjs`, `OBSERVED-DEFECTS.md`) were never added to `SKILL.md`'s Step 2 generation
+table — they'd have been silently skipped by anyone following that table literally. Added now,
+alongside this story's own new rows.
+
 #### Closed: 02.2 — 2026-08-13
 
 Built by subagent, independently re-verified by the orchestrating session (re-ran

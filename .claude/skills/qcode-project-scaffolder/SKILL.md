@@ -129,6 +129,14 @@ leaving every `(to define: …)` gap in place. Create directories as needed.
 | `architecture/01-principles-and-decisions.md` | `architecture/01-principles-and-decisions.md` |
 | `handoffs/README.md` | `handoffs/README.md` |
 | `githooks/pre-commit` | `.githooks/pre-commit` |
+| `githooks/status-guard.sh` | `.githooks/status-guard.sh` |
+| `ci/board-guard.yml` | `.github/workflows/board-guard.yml` |
+| `scripts/status-vocab.mjs` | `scripts/status-vocab.mjs` |
+| `scripts/board-check.mjs` | `scripts/board-check.mjs` |
+| `scripts/board-check.test.mjs` | `scripts/board-check.test.mjs` |
+| `scripts/OBSERVED-DEFECTS.md` | `scripts/OBSERVED-DEFECTS.md` |
+| `scripts/check-links.mjs` | `scripts/check-links.mjs` |
+| `scripts/index-backlog.mjs` | `scripts/index-backlog.mjs` |
 | `cockpit/generate.mjs` | `cockpit/generate.mjs` |
 | `skills/tech-planning/SKILL.md` | `.claude/skills/tech-planning/SKILL.md` |
 | `skills/tech-build/SKILL.md` | `.claude/skills/tech-build/SKILL.md` |
@@ -170,7 +178,7 @@ be auto-re-rendered by the sync tool, which manages skills/hooks/cockpit, not th
 ```sh
 git init -b main
 git config core.hooksPath .githooks
-chmod +x .githooks/pre-commit      # POSIX; on Windows the hook still runs via Git Bash
+chmod +x .githooks/pre-commit .githooks/status-guard.sh   # POSIX; on Windows the hook still runs via Git Bash
 ```
 
 Don't commit automatically — let the user make the first commit so they own it.
@@ -184,6 +192,9 @@ Close with a short report:
   `references/filling-the-gaps.md`), so the team knows exactly what to resolve during foundation.
 - **Next step:** run `tech-planning` for **Epic 01 — Foundation** to begin (plan-first applies from
   the very first line of code). The cockpit works immediately: `node cockpit/generate.mjs`.
+- **The CI guard needs a remote to bite.** `.github/workflows/board-guard.yml` ships already wired
+  to the same predicate as the local hook — once the repo has a GitHub remote, turn it into a
+  required status check under branch protection so `--no-verify` can't quietly skip it on a PR.
 - **Staying current:** the project records its framework version in `.qcode/config.json`; to pull later
   improvements run `qcode-sync` from a QCode-Method clone (see that repo's `docs/updating-projects.md`).
 - Note that `qcode-project-scaffolder/` can now be deleted from the new repo if they want it gone.

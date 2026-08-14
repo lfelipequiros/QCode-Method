@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "cockpit": "node cockpit/generate.mjs",
-    "board:check": "node scripts/board-check.mjs"
+    "board:check": "node scripts/board-check.mjs",
+    "check:links": "node scripts/check-links.mjs"
   }
 }

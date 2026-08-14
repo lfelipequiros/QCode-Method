@@ -11,15 +11,15 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 > subject (see [05.4](backlog/epic-05-generation-engine.md#054--migrate--check-modes)) — proving
 > the v1→v2 path on itself before it's ever run against a consumer project.
 
-**Updated:** 2026-08-13 · **Phase:** Building (epic 02) · **Branch:** `v2-extraction`
+**Updated:** 2026-08-14 · **Phase:** Building (epic 02) · **Branch:** `v2-extraction`
 
-- **Last shipped:** [02.2](backlog/epic-02-shape-and-enforcement.md#022--port-board-checkmjs--fixture-tests) —
-  `board-check.mjs` ported (7 rules, config-driven, zero deps) with a shared `status-vocab.mjs` and
-  39 `node:test` fixture cases. Found and fixed a real cross-story bug in 02.1's board template
-  along the way (`{{EPIC_TABLE}}` breaking table parsing when empty).
-- **Next up:** `02.3` — the shared `status-guard.sh` predicate, `check-links.mjs`, and
-  `index-backlog.mjs`, so `board-check` gets wired into the pre-commit hook and CI, and rule 5's
-  graceful skip starts actually checking links.
+- **Last shipped:** [02.3](backlog/epic-02-shape-and-enforcement.md#023--rebuild-the-guard-as-a-shared-predicate) —
+  `status-guard.sh` (rule 0 NUL/CRLF, rule 7 status-event), `check-links.mjs`, `index-backlog.mjs`,
+  and the CI workflow template, all wired to the same predicate as the local hook. Built directly
+  after a subagent hit a spend limit before writing anything; found and fixed a real slugify bug
+  (GitHub anchors don't collapse multi-space runs) along the way.
+- **Next up:** `02.4` — the cockpit, closing epic 02. Imports `status-vocab.mjs` (C1), distinguishes
+  an absent `CLOSED.md` from an empty one (C3), and renders *Needs status review* rows red.
 
 ## Epics
 
@@ -39,12 +39,13 @@ the story in its epic.
 
 | Story | Status | Link |
 |-------|--------|------|
-| 02.3 | `in-progress` | [epic-02 § 02.3](backlog/epic-02-shape-and-enforcement.md#023--rebuild-the-guard-as-a-shared-predicate) |
+| 02.4 | `in-progress` | [epic-02 § 02.4](backlog/epic-02-shape-and-enforcement.md#024--cockpit-evolution) |
 
 ## Recently done — the increment log
 
 | Story | Date | Detail |
 |-------|------|--------|
+| 02.3 | 2026-08-14 | [epic-02 § 02.3](backlog/epic-02-shape-and-enforcement.md#023--rebuild-the-guard-as-a-shared-predicate) — status-guard.sh, check-links.mjs, index-backlog.mjs, CI template |
 | 02.2 | 2026-08-13 | [epic-02 § 02.2](backlog/epic-02-shape-and-enforcement.md#022--port-board-checkmjs--fixture-tests) — board-check.mjs, 7 rules, 39 tests |
 | 02.1 | 2026-08-13 | [epic-02 § 02.1](backlog/epic-02-shape-and-enforcement.md#021--information-architecture-the-adr-059-shape) — the ADR-059 shape in the scaffolder templates |
 | 01.1 | 2026-08-13 | [epic-01 § 01.1](backlog/epic-01-secure-base.md#011--commit-token-discipline-v102-branch-bootstrap-the-board) — v1.0.2 + branch + board bootstrap |

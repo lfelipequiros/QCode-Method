@@ -60,8 +60,11 @@ Hand this to the team. Each item is a `(to define)` gap that ships in the genera
 - **Cockpit view** — the cockpit renders an epic-based progress view out of the box. If the project
   wants the *architecture-layer* view instead, fill the `(to define)` `LAYERS` config at the top of
   `cockpit/generate.mjs` (map each layer to the epics that build it).
-- **CI status guard** — the generated `.githooks/pre-commit` is the *local* guard; add an
-  un-bypassable server-side equivalent in CI as an Epic 01 story (it can't be enforced by a template).
+- **CI status guard** — the generated `.githooks/pre-commit` is the *local* guard; the CI twin now
+  ships as a template too (`ci/board-guard.yml` → `.github/workflows/board-guard.yml`), invoking the
+  identical `githooks/status-guard.sh` predicate so local and server-side enforcement can't drift
+  apart. What's left for Epic 01 isn't writing it — it's wiring it into the project's actual GitHub
+  repo (turn the check on as a required status check under branch protection, once there's a remote).
 - **`record-learnings` routing table** — the generated skill ships with the scaffold-default
   destinations (ADR, ASD, TECH-DEBT, OPEN-QUESTIONS, CLAUDE.md, backlog, memory, handoff). Its table
   carries one `(to define)` row: add a routing row for each canonical doc this project keeps *beyond*

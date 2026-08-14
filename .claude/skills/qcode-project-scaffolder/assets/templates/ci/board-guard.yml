@@ -1,0 +1,44 @@
+name: Board guard
+
+# The CI twin of the local `.githooks/pre-commit` hook. Both invoke the exact same
+# predicate (`.githooks/status-guard.sh`) so local and server-side enforcement can
+# never drift apart — this workflow adds no rules of its own, it just makes the local
+# guard un-bypassable (a `--no-verify` commit still gets caught here before it merges).
+#
+# Target path once scaffolded: .github/workflows/board-guard.yml
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  board-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history — the diff range below needs it
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run the shared status-guard predicate
+        shell: bash
+        run: |
+          set -e
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
+          else
+            base="${{ github.event.before }}"
+            head="${{ github.sha }}"
+            # A brand-new branch's first push reports an all-zero "before" SHA — there is
+            # no prior commit to diff against, so fall back to this push's own parent.
+            if [ "$base" = "0000000000000000000000000000000000000000" ] || [ -z "$base" ]; then
+              base=$(git rev-parse "$head~1" 2>/dev/null || git hash-object -t tree /dev/null)
+            fi
+          fi
+          git diff --name-status --diff-filter=ACMRD "$base" "$head" \
+            | sh .githooks/status-guard.sh
