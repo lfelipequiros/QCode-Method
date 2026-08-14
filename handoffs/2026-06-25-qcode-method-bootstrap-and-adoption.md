@@ -89,5 +89,6 @@ The session that took **QCode-Method** from a half-built partial copy (a dead se
   [`docs/updating-projects.md`](../docs/updating-projects.md) (the qcode-sync + adoption model).
 - The scaffolder: [`.claude/skills/qcode-project-scaffolder/SKILL.md`](../.claude/skills/qcode-project-scaffolder/SKILL.md)
   + [`references/filling-the-gaps.md`](../.claude/skills/qcode-project-scaffolder/references/filling-the-gaps.md).
-- The updater: [`scripts/qcode-sync.mjs`](../scripts/qcode-sync.mjs).
+- The updater: `scripts/qcode-sync.mjs` at the time of this session — superseded by
+  [`qcode.mjs`](../qcode.mjs)'s `sync` mode as of the v2 extraction (epic 05).
 - Lineage/origin: the four `mompas-handoffs` in the Finosonido repo (esp. `2026-06-18-pips-project-scaffolder.md`).

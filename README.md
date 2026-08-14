@@ -17,7 +17,9 @@ This repo is the **framework itself**, not an application. You don't run a proje
   QA proves it's done-done. A built-in **architecture-decision lane** routes every finding to one
   home (cite a rule · open an ADR · log debt · raise an open question).
 - **`record-learnings`** — an end-of-session sweep that catches durable knowledge the gates missed and
-  routes each item to its canonical file (ADR / TECH-DEBT / OPEN-QUESTIONS / CLAUDE.md / memory).
+  routes each item to its canonical file (ADR / TECH-DEBT / OPEN-QUESTIONS / CLAUDE.md / backlog /
+  product / handoffs) — every destination a committed, repo-owned surface, never an external memory
+  store.
 - **`handoff`** — durable session summaries so a new chat resumes without replaying the transcript.
 - **`compass-check`** *(optional)* — a read-only "CTO conscience" that sits *above* the gates and
   advises on direction: what to build next, what you're not planning for, whether you're over-building.
@@ -34,13 +36,15 @@ This repo is the **framework itself**, not an application. You don't run a proje
 QCode-Method/
 ├── VERSION                                  # framework version (mirrors the scaffolder's VERSION)
 ├── README.md                                # this file
-├── qcode.mjs                                # the CLI: `generate` today (migrate/check land in 05.4)
-├── lib/qcode-core.mjs                       # shared rendering core qcode.mjs is built on
-├── schema/config.schema.json                # the .qcode/config.json contract
+├── qcode.mjs                                # the CLI — one renderer, four modes: generate/sync/migrate/check
+├── lib/
+│   ├── qcode-core.mjs                       # shared rendering core every mode is built on
+│   └── qcode-migrate.mjs                    # v1 -> v2 backlog-shape parsing/transform (migrate's engine)
+├── schema/                                  # documented JSON contracts (not runtime-validated — zero deps)
+│   ├── config.schema.json                   # the .qcode/config.json contract
+│   └── skills-lock.schema.json              # the skills-lock.json contract
 ├── docs/
 │   └── updating-projects.md                 # how framework updates flow into a scaffolded project
-├── scripts/
-│   └── qcode-sync.mjs                        # pull framework updates into a scaffolded project
 └── .claude/skills/qcode-project-scaffolder/  # the bootstrapper: orchestrator + template source
     ├── SKILL.md                              # gathers static facts, drives `qcode.mjs generate`
     ├── VERSION                               # canonical framework version (travels with the folder)
@@ -73,20 +77,61 @@ wherever the new project should live:
 > interview; `(to define: what — how/when)` is a deliberate, instructed gap you fill *during project
 > foundation*, when you actually have the context to decide well.
 
-## Use 2 — Update an existing project
+## Use 2 — Update an already-scaffolded project
 
-When the framework improves, pull it into a project with **`qcode-sync`** (see
-[`docs/updating-projects.md`](docs/updating-projects.md)):
+When the framework improves, pull it into a project with **`qcode.mjs sync`**, from a fresh
+QCode-Method clone (see [`docs/updating-projects.md`](docs/updating-projects.md) for the full
+framework-owned vs. project-owned split):
 
 ```sh
-node scripts/qcode-sync.mjs "../your-project"           # dry-run: show what would change
-node scripts/qcode-sync.mjs "../your-project" --write    # apply (backs up changed files, bumps version)
+node qcode.mjs sync "../your-project"            # dry-run: show what would change
+node qcode.mjs sync "../your-project" --write     # apply (backs up changed files, bumps version)
 ```
 
-It only re-renders **framework-owned** files (the gates, record-learnings, handoff, compass-check, the
-pre-commit guard, `.gitattributes`, the cockpit). Your **project-owned** files (CLAUDE.md, the board,
-backlog, architecture, README, trackers, `business-context.md`) are never touched. It's diff-first and
-backs up every file it overwrites — treat it as an assisted merge.
+It only re-renders **framework-owned** files (the gates, `record-learnings`, `handoff`,
+`compass-check`, the pre-commit guard, `.gitattributes`, the cockpit, the CI template). Your
+**project-owned** files (`CLAUDE.md`, the board, backlog, architecture, README, trackers,
+`business-context.md`, `skills-lock.json`) are never touched. It's diff-first and backs up every file
+it overwrites — treat it as an assisted merge. A file the project has declared `customized` in
+`.qcode/config.json` is shown as a diff but never overwritten without `--force`.
+
+## Use 3 — Bring an older v1-shaped project into the current shape
+
+A project scaffolded before the ADR-059 board/backlog shape existed (flat `epic-NN.md` files, a
+"Recently done" log on the board) needs a one-time structural conversion `sync` deliberately never
+does — the shape change touches project-owned files sync never writes. `qcode.mjs migrate` does this;
+it's exactly how this repo's own board got here (see `backlog/CLOSED.md` §05.4). Dry-run by default:
+
+```sh
+node qcode.mjs migrate "../your-project"           # dry-run: report the full split/move plan
+node qcode.mjs migrate "../your-project" --write    # apply, then installs the operational tooling too
+```
+
+## Use 4 — Check a project's readiness
+
+```sh
+node qcode.mjs check "../your-project"
+```
+
+Reports two distinct signals: **structural validity** (does `board:check` pass, does the cockpit
+render — exit 0 means yes) and **completeness** (how many `(to define)` gaps remain open — an honest
+count, not a failure by itself). An incomplete-but-valid project is not the same as a broken one.
+
+## Install
+
+Clone and run — no package to install:
+
+```sh
+git clone <this-repo-url> qcode-method
+cd qcode-method
+node qcode.mjs generate ../your-new-project --name "Your Project" --owner "You"
+```
+
+**Deferred: an installable package** (`npx qcode-method generate ...` without a local clone).
+Clone-and-run is simpler to reason about and to keep in sync with while the framework itself is still
+young; packaging it adds a publish/version-tag step for no benefit until there's a real second
+consumer. **Trigger:** the first time a second person, or a second machine, needs to scaffold a
+project and a fresh `git clone` is genuinely more friction than it's worth.
 
 ## Why it's shaped this way
 

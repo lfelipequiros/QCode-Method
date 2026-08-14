@@ -109,6 +109,17 @@ function parseArgs(argv) {
 const slugify = (name) =>
   name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
+// A human-readable host name derived from the --remote URL already asked for as a static-identity
+// fact — never a separate question. Recognizes the common hosts by their well-known domain; falls
+// back to the bare domain for anything else, and to an honest gap when there's no remote yet.
+const KNOWN_HOSTS = { 'github.com': 'GitHub', 'gitlab.com': 'GitLab', 'bitbucket.org': 'Bitbucket' };
+function deriveRepoHost(remote) {
+  if (!remote) return CHARTER_GAP('which git host this repo will live on');
+  const m = remote.match(/(?:@|\/\/)([^/:]+)[:/]/) || remote.match(/(?:@|\/\/)([^/:]+)$/);
+  const domain = m ? m[1] : null;
+  return (domain && KNOWN_HOSTS[domain]) || domain || CHARTER_GAP('which git host this repo will live on');
+}
+
 // ── Gathering the five static-identity answers — flags/config first, then an interactive prompt
 // for whatever's still missing (unless --yes). ──────────────────────────────────────────────────
 
@@ -232,6 +243,7 @@ async function generate(args) {
     PROJECT_NAME: answers.name,
     PROJECT_SLUG: answers.slug,
     OWNER_NAME: answers.owner,
+    REPO_HOST: deriveRepoHost(answers.remote),
     TODAY: today,
     FRAMEWORK_VERSION: frameworkVersion,
   };

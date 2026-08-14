@@ -5,19 +5,22 @@ lives**. Owns exactly one thing — the status of epics and increments — and l
 else. QCode-Method now dogfoods its own method: this board tracks the v2 extraction plan's six
 epics and sixteen stories, built on the `v2-extraction` branch.
 
-**Updated:** 2026-08-14 · **Phase:** Building (epic 06) · **Branch:** `v2-extraction`
+**Updated:** 2026-08-14 · **Phase:** v2.0.0 shipped · **Branch:** `v2-extraction`
 
-- **Last shipped:** [06.1](backlog/epic-06-assembly-and-release/06.1.md) — the `CLAUDE.md` template
-  rewrite. §7 expanded from a flat list into 11 numbered subsections; §7.2 is now the delivery
-  contract's one canonical statement, §7.3 is Fix C8's wrap-up chain (`product-check` → `tech-planning`
-  → `tech-build` → PR → `tech-qa` → merge → `record-learnings`, `handoff` explicitly off-spine), §7.7
-  is the repo-only memory routing table. Every gate template that used to restate the contract now
-  links to §7.2 instead. Verifying the link additions surfaced a real, pre-existing bug dating back to
-  03.1/03.3: `tech-qa`'s seam-invariant gap used different wording than `tech-planning`'s and
-  `tech-build`'s, so `qcode-charter`'s own documented grep for resolving it identically across all
-  three would have silently missed `tech-qa`'s copy. Fixed — all three now match.
-- **Next up:** `06.2` — docs, tokens, `skills-lock.json`, the `VERSION` 2.0.0 bump, and the real,
-  end-to-end day-one acceptance test. The release gate for the whole v2 extraction.
+- **Last shipped:** [06.2](backlog/epic-06-assembly-and-release/06.2.md) — the release gate. `VERSION`
+  reads `2.0.0` at both the framework root and the scaffolder folder. `skills-lock.json` shipped for
+  real, resolving the dead links `tech-planning` (03.1) and `compass-check` (03.4) have carried since
+  those stories — a real `generate` run's self-test passed clean on the first try for the first time
+  all session. `README.md` and `docs/updating-projects.md` rewritten around the real, unified
+  `qcode.mjs` (`generate`/`sync`/`migrate`/`check`); `scripts/qcode-sync.mjs` retired outright once
+  `sync` was confirmed a complete superset. **The day-one acceptance test ran end to end, for real, on
+  a genuine scratch directory:** generate → zero unresolved tokens, `board:check` 0, `check:links`
+  green, cockpit renders → a real first commit with hooks genuinely active, `status-guard.sh` running
+  `board:check` inside the commit itself → `sync` reporting zero diffs (idempotent) → `check` reporting
+  structurally valid with an honest open-gap count. All seven steps passed. **This closes the entire
+  sixteen-story v2 extraction plan** — every epic below is `done`.
+- **Next up:** nothing queued. The `v2-extraction` branch is ready to merge; the framework now
+  dogfoods its own final v2 shape, on itself, as of this commit.
 
 ## Epics
 
@@ -28,7 +31,7 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 | 03 | The gates | `done` | [epic-03](backlog/epic-03-the-gates/README.md) |
 | 04 | The product layer | `done` | [epic-04](backlog/epic-04-product-layer/README.md) |
 | 05 | The generation engine | `done` | [epic-05](backlog/epic-05-generation-engine/README.md) |
-| 06 | Assembly & release | `in-progress` | [epic-06](backlog/epic-06-assembly-and-release/README.md) |
+| 06 | Assembly & release | `done` | [epic-06](backlog/epic-06-assembly-and-release/README.md) |
 
 ## Active increments
 

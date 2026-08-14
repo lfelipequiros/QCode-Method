@@ -4,6 +4,8 @@
 
 {{DOMAIN_SUMMARY}}
 
+**Hosted on:** {{REPO_HOST}}
+
 ## Where things live
 
 This repo is run with a plan-first, single-source-of-truth operating system. Start here:

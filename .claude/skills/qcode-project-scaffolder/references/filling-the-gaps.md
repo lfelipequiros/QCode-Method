@@ -21,6 +21,7 @@ gap for `qcode-charter` to resolve on the project's first real interview. Full l
 | `{{DOMAIN_SUMMARY}}` | A short paragraph: what it does, for whom | `qcode-charter` | `(to define)` gap |
 | `{{TEAM_CONTEXT}}` | Who builds it / consumes it | `generate` (confirmed by `qcode-charter`) | "solo developer" |
 | `{{OWNER_NAME}}` | Who holds the wheel (used by compass-check) | `generate` | "the owner" |
+| `{{REPO_HOST}}` | Where the repo is hosted, shown in the project's own `README.md` | `generate` — derived from `--remote`, never a separate question | `(to define)` gap if no `--remote` was given |
 | `{{CLAUDE_PLAN}}` | Which Claude plan runs the project (feeds `CLAUDE.md` §7's token-discipline defaults) | `generate` (confirmed by `qcode-charter`) | "Pro" |
 | `{{PRODUCT_CONSUMERS}}` | Who reads/acts on the project's product surfaces (used by product-check) | `qcode-charter` | "n/a" if there's no user-facing product surface |
 | `{{TODAY}}` | ISO date at generation time | `generate` | — (runner-supplied) |
@@ -72,10 +73,15 @@ Hand this to the team. Each item is a `(to define)` gap that ships in the genera
   apart. What's left for Epic 01 isn't writing it — it's wiring it into the project's actual GitHub
   repo (turn the check on as a required status check under branch protection, once there's a remote).
 - **`record-learnings` routing table** — the generated skill ships with the scaffold-default
-  destinations (ADR, ASD, TECH-DEBT, OPEN-QUESTIONS, CLAUDE.md, backlog, memory, handoff). Its table
-  carries one `(to define)` row: add a routing row for each canonical doc this project keeps *beyond*
-  the defaults (e.g. a cost/expenses log, a standing strategic-posture file, an integration-research or
+  destinations (ADR, ASD, TECH-DEBT, OPEN-QUESTIONS, CLAUDE.md, backlog, product, handoffs — every
+  row a committed, repo-owned surface; none an external memory store). Its table carries one
+  `(to define)` row: add a routing row for each canonical doc this project keeps *beyond* the
+  defaults (e.g. a cost/expenses log, a standing strategic-posture file, an integration-research or
   environments runbook), mapping each kind of learning to that file during foundation.
+- **Epic numbering beyond eight named epics** — `08` is permanently reserved for the ad-hoc bucket
+  (`backlog/08-adhoc/`) in both `PROJECT-STATUS.md`'s Epics table and `00-roadmap.md`'s Epic map. A
+  project that ends up with more than eight *named* epics numbers around it (`07`, then `09`, `10`,
+  …) rather than renumbering the bucket or colliding with it — the bucket's own id never moves.
 - **compass-check `business-context.md`** (only if the optional advisor was installed) — filled by
   `qcode-charter` in its own first pass; after that, `compass-check` maintains it, asking again only
   when a missing or stale fact would change a recommendation.

@@ -14,6 +14,7 @@ moment `tech-qa` passes it, in the same commit that removes its row from
 
 | Story | Date | PR | Detail |
 |---|---|---|---|
+| 06.2 | 2026-08-14 | — | [epic-06 § 06.2 — release gate: VERSION 2.0.0, skills-lock.json shipped, docs rewritten, day-one acceptance test passed end to end](epic-06-assembly-and-release/06.2.md) |
 | 06.1 | 2026-08-14 | — | [epic-06 § 06.1 — CLAUDE.md rewrite: delivery contract + wrap-up sequence stated once (Fix C8), repo-only memory table](epic-06-assembly-and-release/06.1.md) |
 | 05.4 | 2026-08-14 | — | [epic-05 § 05.4 — migrate + check + sync modes; migrate converted this repo's own backlog for real, 12 real bugs found and fixed along the way](epic-05-generation-engine/05.4.md) |
 | 05.3 | 2026-08-14 | — | [epic-05 § 05.3 — qcode-charter skill, orchestrator slimmed to 5 steps, a real generate run caught a live-token-in-prose bug, 2 stale docs fixed](epic-05-generation-engine/05.3.md) |
