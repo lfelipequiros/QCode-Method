@@ -1,219 +1,97 @@
 ---
 name: qcode-project-scaffolder
 description: >-
-  White-label bootstrapper that scaffolds the entire QCode-Method AI-driven-development operating
-  system into a NEW project — the same product-check→plan→build→qa discipline, status board,
-  trackers, backlog, the record-learnings sweep + handoff system, git guard, progress cockpit, and
-  (optionally) the compass-check strategic advisor, generalized and tailored by interview. Use this
-  when starting a new repo / project and you want the project-management + SDLC scaffolding set up
-  from day one: "scaffold a new project, bootstrap the SDLC, set up project management, kickstart an
-  AI-dev project, give me the gates/status board/handoffs in this repo, set up the operating system,
-  run QCode." It runs an interview (identity, value model, stack, architecture, house standards,
-  roadmap), then generates the orientation doc (CLAUDE.md), PROJECT-STATUS board, trackers, backlog,
-  the four lifecycle gates (product-check, tech-planning, tech-build, tech-qa) + the record-learnings
-  sweep + handoff skill, the pre-commit guard, the cockpit, and the `.qcode/` config that makes the
-  project updatable — every reference-platform detail replaced by either an interview-filled value or
-  a marked `(to define)` gap with instructions for filling it during project foundation. Do NOT use it
-  to plan a feature inside an already-scaffolded project (that's tech-planning, or product-check for a
-  new idea) — this sets up the framework itself, once, per project. Copy this skill folder into the
-  target repo first, then run it there.
+  Entry point for bootstrapping a NEW project onto QCode-Method — the same product-check→plan→
+  build→qa discipline, status board, trackers, backlog, the record-learnings sweep + handoff
+  system, git guard, progress cockpit, and (optionally) the compass-check strategic advisor. Use
+  this when starting a new repo and you want the project-management + SDLC scaffolding set up from
+  day one: "scaffold a new project, bootstrap the SDLC, set up project management, kickstart an
+  AI-dev project, give me the gates/status board/handoffs in this repo, set up the operating
+  system, run QCode." Gathers the five static-identity facts (name, slug, owner, git remote,
+  whether to init git + install compass-check) conversationally, drives `node qcode.mjs generate`
+  to render the whole tree and self-test it, then hands off to the `qcode-charter` skill — now
+  present in the new project — for the judgment interview (goal, value model, stack, architecture,
+  roadmap) this skill deliberately does not ask itself. Do NOT use it to plan a feature inside an
+  already-scaffolded project (that's `tech-planning`, or `product-check` for a new idea) — this
+  bootstraps the framework itself, once, per project. Run from a QCode-Method clone; nothing needs
+  to be copied into the target repo first.
 ---
 
 # QCode Project Scaffolder
 
-A bootstrapper. It takes the **QCode-Method** operating system — plan-first gates, a
-single-source-of-truth status board, ROI-justified and stage-gated work, traceable decisions (ADRs),
-a knowledge-loop sweep + session continuity (record-learnings + handoffs), a git guard that keeps it
-honest, a live progress cockpit, and an optional strategic conscience (compass-check) — and **stamps a
-tailored copy of it into a new project.**
-
-The hard-won insight it encodes: a project's *discipline and structure* are reusable; its *domain,
-value model, stack, and architecture* are not. So this skill generates the first fully and
-**interviews you to fill the second** — and where an answer can't be settled at interview time, it
-leaves an explicit **`(to define)` gap with instructions** rather than a silent assumption.
-
-It also writes a small **`.qcode/config.json`** into the new project that records the framework version
-and the interview answers, so the project can later **pull framework updates** with `qcode-sync` (see
-the QCode-Method `docs/updating-projects.md`).
+The entry point for turning "I want a new project on QCode-Method" into a real, working repo. It
+does not do the scaffolding itself — it **drives** `qcode.mjs generate` (a script: deterministic,
+self-testing, zero judgment) and then **hands off** to `qcode-charter` (a skill: the interview for
+everything a script can't decide). This split is deliberate — see "Why it's shaped this way."
 
 ## How to use it
 
-This skill scaffolds a *new* repo. **Copy this whole folder
-(`.claude/skills/qcode-project-scaffolder/`) into the target repo first**, then invoke it there. It
-writes into that repo's root and `.claude/skills/`. It is a one-time tool per project — you may delete
-it after bootstrapping, or keep it.
+**Nothing needs to be copied anywhere first.** Run this from a QCode-Method clone; `qcode.mjs`
+renders from that clone's own `assets/templates/` into whatever target path you give it.
 
-> Source of truth: this skill ships inside the **QCode-Method** framework repo
-> (`git@github.com:lfelipequiros/QCode-Method.git`). To scaffold a new project, copy the skill folder
-> from a current clone of that repo so you get the latest templates.
+1. **Gather the five static-identity answers conversationally** — don't make the user learn CLI
+   flags. Ask (or infer from what they've already said):
+   - **Project name** and **slug** (kebab-case; offer to derive the slug from the name).
+   - **Owner** — who holds the wheel (used by `compass-check` if installed; default "the owner").
+   - **Git remote** (optional — skip if they don't have one yet).
+   - **Initialize git + install the status-guard hook now?** (default yes.)
+   - **Install the optional `compass-check` strategic advisor?** (default yes.)
+
+   That's the whole ask here — no value model, no stack, no architecture, no roadmap. Those are
+   `qcode-charter`'s job, next; asking them now would mean asking twice or guessing badly once.
+2. **Run `qcode.mjs generate`** via Bash, with every answer as an explicit flag and `--yes` — don't
+   rely on the script's own interactive prompts, since a tool-driven Bash call has no real TTY for
+   them to read from:
+   ```sh
+   node qcode.mjs generate <target-dir> --name "<name>" --slug <slug> --owner "<owner>" \
+     [--remote <url>] [--git|--no-git] [--compass-check|--no-compass-check] --yes
+   ```
+   It renders every template, merges `package.json`, writes `.qcode/config.json`, optionally runs
+   `git init` + installs the hook, then **self-tests** (`board:check` + the cockpit must both
+   succeed) before reporting success — if it exits non-zero, that's a rendering bug, not something
+   to paper over; report it plainly rather than declaring the project ready.
+3. **Report what it printed** — files created, the `(to define)` gap count, and that status lives
+   only in `PROJECT-STATUS.md`.
+4. **Hand off to `qcode-charter`.** It's now present at `<target-dir>/.claude/skills/qcode-charter/`
+   — say explicitly that it's the next step, and that it needs to run **from inside the new
+   project** (a skill is discovered from the current working directory's own `.claude/skills/`, so
+   switch context there before invoking it). Don't run its interview yourself from here.
+5. **Staying current, later:** once the project exists, framework updates land the same way —
+   `qcode.mjs sync <target-dir>` (or `qcode.mjs migrate`, for a shape change) from a fresh
+   QCode-Method clone. See `docs/updating-projects.md`.
 
 ## Placeholder convention (read `references/filling-the-gaps.md`)
 
-Templates carry two kinds of blanks. Hold this distinction the whole way through:
+Templates carry two kinds of blanks — worth understanding even though this skill no longer
+substitutes them itself (`qcode.mjs` does):
 
-- **`{{TOKEN}}`** — resolved *now*, from interview answers (e.g. `{{PROJECT_NAME}}`,
-  `{{VALUE_ARCHETYPES}}`, `{{STACK_DATA}}`). Substitute every occurrence at generation time.
-- **`(to define: <what> — <how/when to fill>)`** — a deliberate gap the interview can't settle (the
-  architecture seams, the canonical model, the tenancy key). Leave it **in place, verbatim**, for the
-  team to resolve during project foundation (usually Epic 01). It carries its own instruction.
+- **`{{TOKEN}}`** — resolved at generate time, from the five static answers plus `qcode-charter`'s
+  later judgment answers (until then, a sensible default or a `(to define: ...)` placeholder).
+- **`(to define: <what> — <how/when to fill>)`** — what a judgment token becomes when `generate`
+  can't answer it. Left **in place, verbatim**, for `qcode-charter` to resolve.
 
 The full token list and the gap checklist live in
-[`references/filling-the-gaps.md`](references/filling-the-gaps.md) — read it before generating.
+[`references/filling-the-gaps.md`](references/filling-the-gaps.md).
 
-## Step 1 — Interview
+## Where a template actually goes
 
-Ask these, grouped. Use the `AskUserQuestion` tool for the multiple-choice ones; let the user free-text
-the rest. Don't over-ask — offer sensible defaults (shown) and accept them.
-
-1. **Identity** — `{{PROJECT_NAME}}`, `{{PROJECT_SLUG}}` (kebab-case), `{{ONE_LINER}}`, and a short
-   `{{DOMAIN_SUMMARY}}` (what it does, for whom).
-2. **People** — `{{TEAM_CONTEXT}}` (solo? a small team? who consumes the output?), and `{{OWNER_NAME}}`
-   (who holds the wheel — used by compass-check if enabled; default "the owner").
-3. **Product consumers** — `{{PRODUCT_CONSUMERS}}`: who reads/acts on this project's product surfaces
-   (an operator, an admin, an end user, a specific role)? Feeds `product-check`'s interview question
-   and gatekeeping. *Default if the project has no user-facing product surface* (a library, a
-   pipeline, an internal CLI): "n/a" — `product-check` still ships, but its own skill routes every
-   idea straight to `tech-planning` instead of running its interview.
-4. **Claude plan** — `{{CLAUDE_PLAN}}`: which Claude plan runs this project (Pro / Max 5x / Max 20x /
-   API pay-per-token)? Feeds the CLAUDE.md §7 token-discipline defaults (model-per-stage, session
-   hygiene) — a Pro-plan project needs those defaults enforced much more aggressively than an
-   API/Max-20x one. *Default:* "Pro" if unsure.
-5. **Value model** — `{{VALUE_ARCHETYPES}}`: the 1–3 ways this project creates value (the generalized
-   ROI lens). *Default offered:* "replace/avoid a cost · prevent a loss · enable downstream value."
-   And `{{DECISION_AXES}}` — *default:* "Confidence · Time-to-market · Reliability · ROI."
-6. **Stack** — `{{STACK_HOSTING}}`, `{{STACK_FRONTEND}}`, `{{STACK_BACKEND}}`, `{{STACK_DATA}}`,
-   `{{STACK_AI}}` (any "none" is fine).
-7. **Architecture** — is there a layered/seam shape? If yes, capture `{{ARCHITECTURE_OVERVIEW}}`
-   (the layers + the seams that hold them apart). If it's not settled, leave the architecture seams as
-   a `(to define)` gap. Also: multi-tenant? → `{{TENANCY}}` = the tenant key name (e.g. `tenant_id`)
-   or "single-tenant."
-8. **House standards** — `{{HOUSE_STANDARDS}}`. *Default offered:* a typed result wrapper
-   (`{{TYPED_RESULT_NAME}}`, default `Result<T>`), schema validation at boundaries, strict types,
-   structured/prefixed logs, "no schema change without the matching data-access update."
-9. **Data-access seam** — does the project read data through a typed package? → `{{ACCESS_LAYER}}`
-   (e.g. `@{{PROJECT_SLUG}}/data`) or "n/a." If undecided, `(to define)`.
-10. **Roadmap** — at least Epic 01 (Foundation). For each epic beyond Foundation capture its number,
-   name, one-line outcome, value archetype, and dependency, then render the rows into **both** epic
-   tables from the same data: `{{EPIC_TABLE}}` (the board format in `PROJECT-STATUS.md` — `Status /
-   Detail` columns) and `{{EPIC_TABLE_ROADMAP}}` (the roadmap format in `backlog/00-roadmap.md` —
-   `Outcome / Value archetype / Depends on` columns). *Default:* Foundation only → **delete both
-   tokens' lines entirely** — do not leave a blank line in their place. Each token sits alone on its
-   own line inside a markdown table; a blank line there ends the table early (`board-check`'s row
-   reader stops at the first line that isn't a table row), which silently hides every row below it
-   — including the ad-hoc bucket's own row — from every rule that reads that table. Substituting
-   "empty" must mean *no line*, not *an empty one*.
-11. **Strategic advisor** — install the optional **`compass-check`** skill (a read-only CTO-conscience
-    that sits above the gates and advises on direction)? *(yes/no — default yes.)*
-12. **Git** — initialize the repo + install the status-guard hook now? (yes/no)
-
-Echo the resolved values back before generating, so the user can correct them. Resolve `{{TODAY}}`
-(ISO date) and `{{FRAMEWORK_VERSION}}` (read from the `VERSION` file in this skill folder) at
-generation time.
-
-## Step 2 — Generate
-
-Copy each template from `assets/templates/` to its target path, substituting every `{{TOKEN}}` and
-leaving every `(to define: …)` gap in place. Create directories as needed.
-
-| Template (`assets/templates/…`) | Target path (repo root) |
-|---|---|
-| `CLAUDE.md` | `CLAUDE.md` |
-| `README.md` | `README.md` |
-| `PROJECT-STATUS.md` | `PROJECT-STATUS.md` |
-| `OPEN-QUESTIONS.md` | `OPEN-QUESTIONS.md` |
-| `TECH-DEBT.md` | `TECH-DEBT.md` |
-| `env.example` | `.env.example` |
-| `gitignore` | `.gitignore` |
-| `gitattributes` | `.gitattributes` |
-| `package.json` | `package.json` |
-| `backlog/00-roadmap.md` | `backlog/00-roadmap.md` |
-| `backlog/CLOSED.md` | `backlog/CLOSED.md` |
-| `backlog/ACCEPTED.md` | `backlog/ACCEPTED.md` |
-| `backlog/epic-01-foundation/` *(directory — copy every file inside, preserving structure)* | `backlog/epic-01-foundation/` |
-| `backlog/08-adhoc/` *(directory — copy every file inside, preserving structure)* | `backlog/08-adhoc/` |
-| `product/decisions.md` | `product/decisions.md` |
-| `product/screens-map.md` | `product/screens-map.md` |
-| `architecture/00-overview.md` | `architecture/00-overview.md` |
-| `architecture/01-principles-and-decisions.md` | `architecture/01-principles-and-decisions.md` |
-| `handoffs/README.md` | `handoffs/README.md` |
-| `githooks/pre-commit` | `.githooks/pre-commit` |
-| `githooks/status-guard.sh` | `.githooks/status-guard.sh` |
-| `ci/board-guard.yml` | `.github/workflows/board-guard.yml` |
-| `scripts/status-vocab.mjs` | `scripts/status-vocab.mjs` |
-| `scripts/board-check.mjs` | `scripts/board-check.mjs` |
-| `scripts/board-check.test.mjs` | `scripts/board-check.test.mjs` |
-| `scripts/OBSERVED-DEFECTS.md` | `scripts/OBSERVED-DEFECTS.md` |
-| `scripts/check-links.mjs` | `scripts/check-links.mjs` |
-| `scripts/index-backlog.mjs` | `scripts/index-backlog.mjs` |
-| `cockpit/generate.mjs` | `cockpit/generate.mjs` |
-| `skills/product-check/SKILL.md` | `.claude/skills/product-check/SKILL.md` |
-| `skills/tech-planning/SKILL.md` | `.claude/skills/tech-planning/SKILL.md` |
-| `skills/tech-build/SKILL.md` | `.claude/skills/tech-build/SKILL.md` |
-| `skills/tech-qa/SKILL.md` | `.claude/skills/tech-qa/SKILL.md` |
-| `skills/record-learnings/SKILL.md` | `.claude/skills/record-learnings/SKILL.md` |
-| `skills/handoff/SKILL.md` | `.claude/skills/handoff/SKILL.md` |
-| `skills/compass-check/SKILL.md` *(only if chosen in Q9)* | `.claude/skills/compass-check/SKILL.md` |
-| `skills/compass-check/business-context.md` *(only if chosen in Q9)* | `.claude/skills/compass-check/business-context.md` |
-
-The generated gate skills use repo-root-relative links (`../../../PROJECT-STATUS.md`) that resolve
-correctly at that depth — keep them as-is.
-
-## Step 3 — Write the QCode config (makes the project updatable)
-
-Write **`.qcode/config.json`** at the repo root. This is what `qcode-sync` reads later to pull
-framework updates without clobbering project-owned files:
-
-```json
-{
-  "frameworkVersion": "{{FRAMEWORK_VERSION}}",
-  "scaffoldedAt": "{{TODAY}}",
-  "compassCheck": <true|false from Q9>,
-  "tokens": {
-    "PROJECT_NAME": "…", "PROJECT_SLUG": "…", "ONE_LINER": "…", "OWNER_NAME": "…",
-    "TEAM_CONTEXT": "…", "PRODUCT_CONSUMERS": "…", "CLAUDE_PLAN": "…", "VALUE_ARCHETYPES": "…", "DECISION_AXES": "…",
-    "STACK_HOSTING": "…", "STACK_FRONTEND": "…", "STACK_BACKEND": "…",
-    "STACK_DATA": "…", "STACK_AI": "…", "TENANCY": "…",
-    "TYPED_RESULT_NAME": "…", "ACCESS_LAYER": "…"
-  }
-}
-```
-
-Record **every token you substituted** (multi-line tokens like `{{DOMAIN_SUMMARY}}`,
-`{{ARCHITECTURE_OVERVIEW}}`, `{{HOUSE_STANDARDS}}`, `{{EPIC_TABLE}}` can be stored too — they just won't
-be auto-re-rendered by the sync tool, which manages skills/hooks/cockpit, not the project-owned docs).
-
-## Step 4 — Initialize git (if chosen)
-
-```sh
-git init -b main
-git config core.hooksPath .githooks
-chmod +x .githooks/pre-commit .githooks/status-guard.sh   # POSIX; on Windows the hook still runs via Git Bash
-```
-
-Don't commit automatically — let the user make the first commit so they own it.
-
-## Step 5 — Hand back the keys
-
-Close with a short report:
-
-- **What was generated** (the tree above), and that status lives only in `PROJECT-STATUS.md`.
-- **The `(to define)` gap checklist** — list every gap left in the generated files (from
-  `references/filling-the-gaps.md`), so the team knows exactly what to resolve during foundation.
-- **Next step:** run `tech-planning` for **Epic 01 — Foundation** to begin (plan-first applies from
-  the very first line of code). Foundation is enabler work, not a product idea, so it skips
-  `product-check` per that skill's own rule — but every *product* idea after Foundation starts there
-  instead. The cockpit works immediately: `node cockpit/generate.mjs`.
-- **The CI guard needs a remote to bite.** `.github/workflows/board-guard.yml` ships already wired
-  to the same predicate as the local hook — once the repo has a GitHub remote, turn it into a
-  required status check under branch protection so `--no-verify` can't quietly skip it on a PR.
-- **Staying current:** the project records its framework version in `.qcode/config.json`; to pull later
-  improvements run `qcode-sync` from a QCode-Method clone (see that repo's `docs/updating-projects.md`).
-- Note that `qcode-project-scaffolder/` can now be deleted from the new repo if they want it gone.
+`qcode.mjs generate` renders every file under `assets/templates/` — the mapping from a template's
+path to its target path is **code**, not a hand-maintained list here (a second, hand-written copy
+of the same mapping is exactly the kind of drift this framework's own tooling exists to prevent
+elsewhere; see `lib/qcode-core.mjs`'s own header). Read `templateToTargetPath()` in
+[`../../../lib/qcode-core.mjs`](../../../lib/qcode-core.mjs) if you need the exact rule set — in
+short: most paths map 1:1, `skills/*` gains a `.claude/` prefix, `githooks/*` gains a `.` prefix,
+`ci/board-guard.yml` goes to `.github/workflows/`, and the bare dotfile templates
+(`gitignore`/`gitattributes`/`env.example`) gain their leading dot.
 
 ## Why it's shaped this way
 
-The interview front-loads the *value model and architecture* on purpose — those are what make the
-generated CLAUDE.md and gates actually fit the new project instead of being generic boilerplate. And
-the `(to define)` gaps are a feature, not laziness: a marked, instructed blank invites the team to
-make the decision deliberately during foundation, which is exactly when they have the context to make
-it well — far better than a hidden assumption inherited from another project's domain.
+A project's *discipline and structure* are reusable; its *domain, value model, stack, and
+architecture* are not — and neither is deterministic to derive the way a slug or a file path is. So
+this splits cleanly along that line: a **script** (`qcode.mjs generate`) does everything that's
+actually mechanical and can prove itself correct (self-testing before declaring success is only
+possible because it's deterministic), and a **skill** (`qcode-charter`) does everything that
+genuinely needs judgment, with every gap it can't yet resolve left as an explicit, instructed
+`(to define)` marker rather than a silent guess. Splitting them was also what made the script
+*testable* in the first place — 05.1/05.2's fixture suites exercise `generate` end-to-end against
+real scratch directories precisely because it has no conversational judgment baked into it to mock.

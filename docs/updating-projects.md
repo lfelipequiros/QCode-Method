@@ -17,8 +17,9 @@ on the framework — and which files that touches.
    (has .qcode/config.json)                with its own recorded tokens
 ```
 
-- **Scaffold** a new project once with `qcode-project-scaffolder` (copy the skill folder into the new
-  repo, run it). It writes `.qcode/config.json` recording the framework version + the interview tokens.
+- **Scaffold** a new project once with `qcode-project-scaffolder`, run from a QCode-Method clone
+  (nothing to copy first) — it drives `qcode.mjs generate` and hands off to `qcode-charter` for the
+  judgment interview. It writes `.qcode/config.json` recording the framework version + every token.
 - **Update** an existing project any time by running `qcode-sync` from a fresh QCode-Method clone,
   pointing it at that project.
 
