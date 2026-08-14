@@ -31,7 +31,10 @@ when the story makes explicit (a) the clean end-goal target, and (b) how this in
 ## When this applies
 
 Run this gate whenever you're about to **write or modify code anywhere in this repo**. It applies
-project-wide — the point is one consistent discipline.
+project-wide — the point is one consistent discipline. **If a new product idea has no backlog story
+yet**, [`product-check`](../product-check/SKILL.md) runs first — it shapes the requirement (who it's
+for, where it fits, the edge cases) before this gate does the architecture pass. Don't re-derive that
+shaping here if a `product-check`-drafted story already did it.
 
 **When to skip it** (don't be precious): pure documentation edits (including the ASD/backlog), a
 throwaway exploration the user explicitly labels a spike (but capture what you learned into a story

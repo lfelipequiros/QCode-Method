@@ -86,14 +86,21 @@ implementation only after approval.
 ## 7. How Claude Should Operate in This Project
 
 - **Senior architect/analyst posture:** analysis → recommendation → (approval) → implementation.
-- **Plan-first discipline & the three-gate lifecycle:** never write/modify code without an approved
-  plan. Three skills enforce one lifecycle:
+- **Plan-first discipline & the four-gate lifecycle:** never write/modify code without an approved
+  plan, and never let a new product idea reach architecture planning unshaped. Four skills enforce
+  one lifecycle:
+  - **`product-check`** (originate) — before a new idea becomes a backlog story at all, shapes and
+    gatekeeps the *requirement*: checks it against the backlog and the product map for
+    duplication/fit, works through prioritization and edge cases, hands off a product-shaped story.
+    Stops before architecture — that's `tech-planning`'s job next. Skips itself for work with no
+    product-facing requirement (a bug fix, tech-debt paydown, Foundation-style enabler work).
   - **`tech-planning`** (plan) — before any code, turns the task into an approved backlog story
     (architecture-aligned, value archetype named, target → increment → path-to-target explicit).
   - **`tech-build`** (build) — implements *only* the approved increment, holds the invariants, runs a
     divergence protocol so code never silently drifts from the plan.
   - **`tech-qa`** (prove it's done-done) — the independent pass: compliance review + results
-    verification against the story's acceptance criteria, before anything merges or ships.
+    verification against the story's acceptance criteria, before anything merges or ships. The only
+    gate that merges.
 - **The status board is the single status surface.** [`PROJECT-STATUS.md`](PROJECT-STATUS.md) owns
   status (zero duplication), updated in the same commit as the work. A `.githooks/pre-commit` guard
   backstops it.

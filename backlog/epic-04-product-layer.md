@@ -61,6 +61,37 @@ citation replaced by a generic instruction.
 - `record-learnings` (03.4) can now have its `(to define)` PDR/surface-map routing row filled in —
   tracked as a follow-up edit to that story, not a new one.
 
-#### Closed: 04.1
+#### Closed: 04.1 — 2026-08-14
 
-_Filled in once the subagent pass is QA'd and lands._
+Built directly. All acceptance criteria confirmed by direct grep, not assumed: zero Mompa-specific
+terms (COO/CMO/PDR numbers/venue names) in the generalized file; "screens" fully replaced by
+"surfaces" (checked separately from the filename `screens-map.md`, which correctly stays as-is);
+the lifecycle diagram now reads "four gates, product-check first" identically in `CLAUDE.md`, the
+scaffolder's own `README.md` template, and the scaffolder `SKILL.md`'s own description; both new
+tracker templates exist and are cross-linked.
+
+**A real convention violation found and fixed at self-check, not assumed clean.** The first draft
+referenced sibling skills (`tech-planning`, `tech-build`, `tech-qa`, `compass-check`) as plain
+backtick mentions throughout — but every other gate template (verified by grepping
+`tech-build`/`tech-qa`/`compass-check`'s own actual link syntax) uses real markdown links for these
+cross-references, both for house-style consistency and because a real link gets checked by
+`check-links.mjs` once it runs for real, where a backtick mention doesn't. Fixed the structural
+mentions (the lifecycle-diagram intro, both "vs. X" section headers, the final hand-off line) to
+real links; re-verified via `grep -oE ']\([^)]+\)'` that all four sibling-skill links now resolve to
+the correct relative paths.
+
+**The follow-up edit promised in this story's own acceptance criteria was done, not deferred
+again.** 03.4 left `record-learnings`' product-surface routing row as `(to define)` specifically
+because `product/decisions.md` and `product/screens-map.md` didn't exist yet. Now that this story
+creates them, the row was updated to link both files directly rather than leaving the placeholder in
+place — a `(to define)` gap that could be resolved in the same story that removes its own precondition
+is resolved, not carried forward to look tidy in a different story's diff.
+
+**Also fixed:** the `filling-the-gaps.md` "note on the gates" still said "the three gate skills" and
+"revisit the three gate skills" — updated for the fourth, and added a paragraph explaining
+`product-check`'s different shape (fully generic except one token, with a real skip path when
+`{{PRODUCT_CONSUMERS}}` is "n/a" rather than dead ceremony on a library/pipeline project).
+
+**Epic 04 closes with this story** — it was always scoped as a single story. Every forward reference
+the epic-03 gates carried to `product-check` (`skills-lock.json` aside, which is 06.2's own promise)
+is now resolved: `compass-check` and `record-learnings` both point at real files, not placeholders.

@@ -17,6 +17,7 @@ Substitute every occurrence at generation time. Full list:
 | `{{DOMAIN_SUMMARY}}` | A short paragraph: what it does, for whom | — (required) |
 | `{{TEAM_CONTEXT}}` | Who builds it / consumes it | "solo developer" |
 | `{{OWNER_NAME}}` | Who holds the wheel (used by compass-check) | "the owner" |
+| `{{PRODUCT_CONSUMERS}}` | Who reads/acts on the project's product surfaces (used by product-check) | "n/a" if there's no user-facing product surface |
 | `{{TODAY}}` | ISO date at generation time | — (runner-supplied) |
 | `{{FRAMEWORK_VERSION}}` | QCode-Method version stamped into `.qcode/config.json` | read from the skill's `VERSION` file |
 | `{{VALUE_ARCHETYPES}}` | 1–3 ways it creates value (generalized ROI) | "replace/avoid a cost · prevent a loss · enable downstream value" |
@@ -81,6 +82,12 @@ Hand this to the team. Each item is a `(to define)` gap that ships in the genera
 universal and ships intact. Their *invariants* (the seam checks, the tenant key + access policies, the
 typed result wrapper + boundary validation) are parameterized by `{{HOUSE_STANDARDS}}` /
 `{{ACCESS_LAYER}}` / `{{TENANCY}}` tokens plus `(to define)` gaps for the architecture-specific checks.
-After foundation resolves those gaps, revisit the three gate skills once and replace any remaining
+After foundation resolves those gaps, revisit these three gate skills once and replace any remaining
 `(to define)` in their alignment checklists with the project's now-real invariants — a five-minute pass
 that makes the gates bite.
+
+`product-check`, the fourth gate, is different: it's already fully generic (its interview, edge-case
+checklist, and gatekeeping posture don't depend on the stack or architecture at all) except for
+`{{PRODUCT_CONSUMERS}}`. If that resolved to "n/a" at interview time, the skill still ships — it just
+routes every idea straight to `tech-planning` per its own "when this applies" section, rather than
+running dead ceremony on a project with no user-facing product surface.

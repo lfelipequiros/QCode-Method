@@ -2,20 +2,21 @@
 name: qcode-project-scaffolder
 description: >-
   White-label bootstrapper that scaffolds the entire QCode-Method AI-driven-development operating
-  system into a NEW project — the same plan→build→qa discipline, status board, trackers, backlog,
-  the record-learnings sweep + handoff system, git guard, progress cockpit, and (optionally) the
-  compass-check strategic advisor, generalized and tailored by interview. Use this when starting a new
-  repo / project and you want the project-management + SDLC scaffolding set up from day one: "scaffold
-  a new project, bootstrap the SDLC, set up project management, kickstart an AI-dev project, give me
-  the gates/status board/handoffs in this repo, set up the operating system, run QCode." It runs an
-  interview (identity, value model, stack, architecture, house standards, roadmap), then generates the
-  orientation doc (CLAUDE.md), PROJECT-STATUS board, trackers, backlog, the three lifecycle gates + the
-  record-learnings sweep + handoff skill, the pre-commit guard, the cockpit, and the `.qcode/` config
-  that makes the project updatable — every reference-platform detail replaced by either an
-  interview-filled value or a marked `(to define)` gap with instructions for filling it during project
-  foundation. Do NOT use it to plan a feature inside an already-scaffolded project (that's
-  tech-planning) — this sets up the framework itself, once, per project. Copy this skill folder into
-  the target repo first, then run it there.
+  system into a NEW project — the same product-check→plan→build→qa discipline, status board,
+  trackers, backlog, the record-learnings sweep + handoff system, git guard, progress cockpit, and
+  (optionally) the compass-check strategic advisor, generalized and tailored by interview. Use this
+  when starting a new repo / project and you want the project-management + SDLC scaffolding set up
+  from day one: "scaffold a new project, bootstrap the SDLC, set up project management, kickstart an
+  AI-dev project, give me the gates/status board/handoffs in this repo, set up the operating system,
+  run QCode." It runs an interview (identity, value model, stack, architecture, house standards,
+  roadmap), then generates the orientation doc (CLAUDE.md), PROJECT-STATUS board, trackers, backlog,
+  the four lifecycle gates (product-check, tech-planning, tech-build, tech-qa) + the record-learnings
+  sweep + handoff skill, the pre-commit guard, the cockpit, and the `.qcode/` config that makes the
+  project updatable — every reference-platform detail replaced by either an interview-filled value or
+  a marked `(to define)` gap with instructions for filling it during project foundation. Do NOT use it
+  to plan a feature inside an already-scaffolded project (that's tech-planning, or product-check for a
+  new idea) — this sets up the framework itself, once, per project. Copy this skill folder into the
+  target repo first, then run it there.
 ---
 
 # QCode Project Scaffolder
@@ -68,25 +69,30 @@ the rest. Don't over-ask — offer sensible defaults (shown) and accept them.
    `{{DOMAIN_SUMMARY}}` (what it does, for whom).
 2. **People** — `{{TEAM_CONTEXT}}` (solo? a small team? who consumes the output?), and `{{OWNER_NAME}}`
    (who holds the wheel — used by compass-check if enabled; default "the owner").
-3. **Claude plan** — `{{CLAUDE_PLAN}}`: which Claude plan runs this project (Pro / Max 5x / Max 20x /
+3. **Product consumers** — `{{PRODUCT_CONSUMERS}}`: who reads/acts on this project's product surfaces
+   (an operator, an admin, an end user, a specific role)? Feeds `product-check`'s interview question
+   and gatekeeping. *Default if the project has no user-facing product surface* (a library, a
+   pipeline, an internal CLI): "n/a" — `product-check` still ships, but its own skill routes every
+   idea straight to `tech-planning` instead of running its interview.
+4. **Claude plan** — `{{CLAUDE_PLAN}}`: which Claude plan runs this project (Pro / Max 5x / Max 20x /
    API pay-per-token)? Feeds the CLAUDE.md §7 token-discipline defaults (model-per-stage, session
    hygiene) — a Pro-plan project needs those defaults enforced much more aggressively than an
    API/Max-20x one. *Default:* "Pro" if unsure.
-4. **Value model** — `{{VALUE_ARCHETYPES}}`: the 1–3 ways this project creates value (the generalized
+5. **Value model** — `{{VALUE_ARCHETYPES}}`: the 1–3 ways this project creates value (the generalized
    ROI lens). *Default offered:* "replace/avoid a cost · prevent a loss · enable downstream value."
    And `{{DECISION_AXES}}` — *default:* "Confidence · Time-to-market · Reliability · ROI."
-5. **Stack** — `{{STACK_HOSTING}}`, `{{STACK_FRONTEND}}`, `{{STACK_BACKEND}}`, `{{STACK_DATA}}`,
+6. **Stack** — `{{STACK_HOSTING}}`, `{{STACK_FRONTEND}}`, `{{STACK_BACKEND}}`, `{{STACK_DATA}}`,
    `{{STACK_AI}}` (any "none" is fine).
-6. **Architecture** — is there a layered/seam shape? If yes, capture `{{ARCHITECTURE_OVERVIEW}}`
+7. **Architecture** — is there a layered/seam shape? If yes, capture `{{ARCHITECTURE_OVERVIEW}}`
    (the layers + the seams that hold them apart). If it's not settled, leave the architecture seams as
    a `(to define)` gap. Also: multi-tenant? → `{{TENANCY}}` = the tenant key name (e.g. `tenant_id`)
    or "single-tenant."
-7. **House standards** — `{{HOUSE_STANDARDS}}`. *Default offered:* a typed result wrapper
+8. **House standards** — `{{HOUSE_STANDARDS}}`. *Default offered:* a typed result wrapper
    (`{{TYPED_RESULT_NAME}}`, default `Result<T>`), schema validation at boundaries, strict types,
    structured/prefixed logs, "no schema change without the matching data-access update."
-8. **Data-access seam** — does the project read data through a typed package? → `{{ACCESS_LAYER}}`
+9. **Data-access seam** — does the project read data through a typed package? → `{{ACCESS_LAYER}}`
    (e.g. `@{{PROJECT_SLUG}}/data`) or "n/a." If undecided, `(to define)`.
-9. **Roadmap** — at least Epic 01 (Foundation). For each epic beyond Foundation capture its number,
+10. **Roadmap** — at least Epic 01 (Foundation). For each epic beyond Foundation capture its number,
    name, one-line outcome, value archetype, and dependency, then render the rows into **both** epic
    tables from the same data: `{{EPIC_TABLE}}` (the board format in `PROJECT-STATUS.md` — `Status /
    Detail` columns) and `{{EPIC_TABLE_ROADMAP}}` (the roadmap format in `backlog/00-roadmap.md` —
@@ -96,9 +102,9 @@ the rest. Don't over-ask — offer sensible defaults (shown) and accept them.
    reader stops at the first line that isn't a table row), which silently hides every row below it
    — including the ad-hoc bucket's own row — from every rule that reads that table. Substituting
    "empty" must mean *no line*, not *an empty one*.
-10. **Strategic advisor** — install the optional **`compass-check`** skill (a read-only CTO-conscience
+11. **Strategic advisor** — install the optional **`compass-check`** skill (a read-only CTO-conscience
     that sits above the gates and advises on direction)? *(yes/no — default yes.)*
-11. **Git** — initialize the repo + install the status-guard hook now? (yes/no)
+12. **Git** — initialize the repo + install the status-guard hook now? (yes/no)
 
 Echo the resolved values back before generating, so the user can correct them. Resolve `{{TODAY}}`
 (ISO date) and `{{FRAMEWORK_VERSION}}` (read from the `VERSION` file in this skill folder) at
@@ -125,6 +131,8 @@ leaving every `(to define: …)` gap in place. Create directories as needed.
 | `backlog/ACCEPTED.md` | `backlog/ACCEPTED.md` |
 | `backlog/epic-01-foundation/` *(directory — copy every file inside, preserving structure)* | `backlog/epic-01-foundation/` |
 | `backlog/08-adhoc/` *(directory — copy every file inside, preserving structure)* | `backlog/08-adhoc/` |
+| `product/decisions.md` | `product/decisions.md` |
+| `product/screens-map.md` | `product/screens-map.md` |
 | `architecture/00-overview.md` | `architecture/00-overview.md` |
 | `architecture/01-principles-and-decisions.md` | `architecture/01-principles-and-decisions.md` |
 | `handoffs/README.md` | `handoffs/README.md` |
@@ -138,6 +146,7 @@ leaving every `(to define: …)` gap in place. Create directories as needed.
 | `scripts/check-links.mjs` | `scripts/check-links.mjs` |
 | `scripts/index-backlog.mjs` | `scripts/index-backlog.mjs` |
 | `cockpit/generate.mjs` | `cockpit/generate.mjs` |
+| `skills/product-check/SKILL.md` | `.claude/skills/product-check/SKILL.md` |
 | `skills/tech-planning/SKILL.md` | `.claude/skills/tech-planning/SKILL.md` |
 | `skills/tech-build/SKILL.md` | `.claude/skills/tech-build/SKILL.md` |
 | `skills/tech-qa/SKILL.md` | `.claude/skills/tech-qa/SKILL.md` |
@@ -161,7 +170,7 @@ framework updates without clobbering project-owned files:
   "compassCheck": <true|false from Q9>,
   "tokens": {
     "PROJECT_NAME": "…", "PROJECT_SLUG": "…", "ONE_LINER": "…", "OWNER_NAME": "…",
-    "TEAM_CONTEXT": "…", "CLAUDE_PLAN": "…", "VALUE_ARCHETYPES": "…", "DECISION_AXES": "…",
+    "TEAM_CONTEXT": "…", "PRODUCT_CONSUMERS": "…", "CLAUDE_PLAN": "…", "VALUE_ARCHETYPES": "…", "DECISION_AXES": "…",
     "STACK_HOSTING": "…", "STACK_FRONTEND": "…", "STACK_BACKEND": "…",
     "STACK_DATA": "…", "STACK_AI": "…", "TENANCY": "…",
     "TYPED_RESULT_NAME": "…", "ACCESS_LAYER": "…"
@@ -191,7 +200,9 @@ Close with a short report:
 - **The `(to define)` gap checklist** — list every gap left in the generated files (from
   `references/filling-the-gaps.md`), so the team knows exactly what to resolve during foundation.
 - **Next step:** run `tech-planning` for **Epic 01 — Foundation** to begin (plan-first applies from
-  the very first line of code). The cockpit works immediately: `node cockpit/generate.mjs`.
+  the very first line of code). Foundation is enabler work, not a product idea, so it skips
+  `product-check` per that skill's own rule — but every *product* idea after Foundation starts there
+  instead. The cockpit works immediately: `node cockpit/generate.mjs`.
 - **The CI guard needs a remote to bite.** `.github/workflows/board-guard.yml` ships already wired
   to the same predicate as the local hook — once the repo has a GitHub remote, turn it into a
   required status check under branch protection so `--no-verify` can't quietly skip it on a PR.

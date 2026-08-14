@@ -19,10 +19,12 @@ This repo is run with a plan-first, single-source-of-truth operating system. Sta
 
 ## The lifecycle
 
-All application code flows through three gates (skills under `.claude/skills/`):
+Every new product idea, then all application code, flows through four gates (skills under
+`.claude/skills/`): **`product-check`** (shape the requirement, place it in the backlog) →
 **`tech-planning`** (approved story) → **`tech-build`** (implement only that increment) →
-**`tech-qa`** (independent done-done pass). Status moves on the board in the same commit; a
-`.githooks/pre-commit` guard backstops it. On a fresh clone, activate the hook once:
+**`tech-qa`** (independent done-done pass, and the only one that merges). Status moves on the board
+in the same commit; a `.githooks/pre-commit` guard backstops it. On a fresh clone, activate the hook
+once:
 
 ```sh
 git config core.hooksPath .githooks

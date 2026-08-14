@@ -11,16 +11,16 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 > subject (see [05.4](backlog/epic-05-generation-engine.md#054--migrate--check-modes)) — proving
 > the v1→v2 path on itself before it's ever run against a consumer project.
 
-**Updated:** 2026-08-14 · **Phase:** Building (epic 04) · **Branch:** `v2-extraction`
+**Updated:** 2026-08-14 · **Phase:** Building (epic 05) · **Branch:** `v2-extraction`
 
-- **Last shipped:** [03.4](backlog/epic-03-the-gates.md#034--compass-check--record-learnings-reconciliation) —
-  `compass-check` reads `ACCEPTED.md` + runs `board:check` as the mechanized half of its reconcile;
-  `record-learnings`'s memory routing points at `CLAUDE.md`, never an external store; both state
-  their write boundaries precisely (C9). **This closes epic 03** — all three gates carry the branch
-  contract, four-lane taxonomy, QA rounds, and merge authority.
-- **Next up:** `04.1` — generalize `product-check` (the upstream product gate), plus its
-  `product/decisions.md` PDR log and `product/screens-map.md` surface map. Every forward reference
-  the epic-03 gates carry to this skill gets resolved here.
+- **Last shipped:** [04.1](backlog/epic-04-product-layer.md#041--generalize-product-check--its-trackers) —
+  `product-check` generalized (310 lines, zero Mompa-specific terms), `product/decisions.md` (PDR
+  log) and `product/screens-map.md` (surface map) shipped, the lifecycle diagram now reads "four
+  gates, product-check first" everywhere it's stated. **This closes epic 04** — the whole product
+  layer is now real, not a forward reference.
+- **Next up:** `05.1` — the unified renderer core (`qcode.mjs`): the shared template resolver, token
+  substitution pass, diff engine, and `customized[]` protection that `generate`/`sync`/`migrate` will
+  all import rather than reimplement.
 
 ## Epics
 
@@ -29,8 +29,8 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 | 01 | Secure the base, stand up the board | `done` | [epic-01](backlog/epic-01-secure-base.md) |
 | 02 | The shape and its enforcement | `done` | [epic-02](backlog/epic-02-shape-and-enforcement.md) |
 | 03 | The gates | `done` | [epic-03](backlog/epic-03-the-gates.md) |
-| 04 | The product layer | `in-progress` | [epic-04](backlog/epic-04-product-layer.md) |
-| 05 | The generation engine | `planned` | [epic-05](backlog/epic-05-generation-engine.md) |
+| 04 | The product layer | `done` | [epic-04](backlog/epic-04-product-layer.md) |
+| 05 | The generation engine | `in-progress` | [epic-05](backlog/epic-05-generation-engine.md) |
 | 06 | Assembly & release | `planned` | [epic-06](backlog/epic-06-assembly-and-release.md) |
 
 ## Active increments
@@ -40,12 +40,13 @@ the story in its epic.
 
 | Story | Status | Link |
 |-------|--------|------|
-| 04.1 | `in-progress` | [epic-04 § 04.1](backlog/epic-04-product-layer.md#041--generalize-product-check--its-trackers) |
+| 05.1 | `in-progress` | [epic-05 § 05.1](backlog/epic-05-generation-engine.md#051--the-unified-renderer-core) |
 
 ## Recently done — the increment log
 
 | Story | Date | Detail |
 |-------|------|--------|
+| 04.1 | 2026-08-14 | [epic-04 § 04.1](backlog/epic-04-product-layer.md#041--generalize-product-check--its-trackers) — product-check generalized, PDR log + surface map shipped |
 | 03.4 | 2026-08-14 | [epic-03 § 03.4](backlog/epic-03-the-gates.md#034--compass-check--record-learnings-reconciliation) — ACCEPTED.md + board:check in the reconcile, repo-only memory, C9 write boundaries |
 | 03.3 | 2026-08-14 | [epic-03 § 03.3](backlog/epic-03-the-gates.md#033--tech-qa-rewrite) — QA rounds, three-place close, merge authority |
 | 03.2 | 2026-08-14 | [epic-03 § 03.2](backlog/epic-03-the-gates.md#032--tech-build-rewrite) — branch binding, 4th divergence lane, deliver/PR step |
