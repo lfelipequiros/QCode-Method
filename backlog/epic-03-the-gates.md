@@ -193,6 +193,22 @@ precisely now that `product-check` (epic 04) is about to become a third writer i
 - Both files state, in their own prime-directives section, that they do not write to
   `backlog/`/`product/` — only propose and route.
 
-#### Closed: 03.1–03.4
+#### Closed: 03.4 — 2026-08-14
 
-_Filled in as each story's subagent pass is QA'd and lands._
+Built directly. All three acceptance criteria confirmed by grep, not assumed:
+`backlog/ACCEPTED.md` and the `board:check` reconcile step both present in `compass-check`'s Step
+1; zero remaining occurrences of "auto-memory store" in `record-learnings`'s routing table; both
+files' write-boundary language confirmed present verbatim (`compass-check`'s "never filing a
+`raised` story itself," `record-learnings`'s "propose the edit; hand it to `product-check`").
+
+**The forward-reference pattern held consistently across the whole epic.** `product-check`,
+`skills-lock.json`, and the PDR log / surface map files are all referenced by name in prose (never
+as markdown links, which would trip `check-links.mjs` once it runs for real) across 03.1
+(`skills-lock.json`), 03.2 (the nested-`CLAUDE.md` pointer), and now 03.4 (`product-check` itself,
+twice) — each one resolved by a specific later story already committed to creating the file, not a
+dangling promise.
+
+**Epic 03 closes with this story.** All three gates now carry the branch contract, the four-lane
+taxonomy, QA rounds, and merge authority; the two orienting skills read the new board shape and
+state their write boundaries precisely, closing the loop C9 identified during the original
+coherence audit.
