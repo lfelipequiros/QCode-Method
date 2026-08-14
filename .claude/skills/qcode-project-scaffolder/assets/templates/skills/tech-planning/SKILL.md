@@ -84,11 +84,11 @@ you're unsure whether something is "real code," it is — run the gate.
    are the definition of done. If reality diverges from the plan mid-build, `tech-build`'s divergence
    protocol brings the change back here.
 
-## Delivering the plan — one branch per story
+## Delivering the plan — this gate opens the story's one branch
 
-A story gets **exactly one branch**, and this gate opens it. That branch then carries the plan commit
-*and* the code commits, so the whole story — why, then what — reviews as a single diff and merges
-once, instead of a separate plan PR and code PR for the same piece of work.
+The delivery contract itself — why one branch, why one PR, why the planning-only exception — is
+stated once, in [`CLAUDE.md`](../../../CLAUDE.md) §7.2. What follows is this gate's own procedure for
+executing its part of it.
 
 **On approval, without asking again:**
 
@@ -104,11 +104,9 @@ once, instead of a separate plan PR and code PR for the same piece of work.
    once the code is green, so the reviewer sees plan and code as one diff.
 4. **Tell the user the branch name** in the hand-off.
 
-**The exception — planning-only work goes straight to `main`.** When no code will follow (a re-plan
-or story refresh, a status/doc correction, a standalone ADR), there's no `tech-build` to build on the
-branch and no `tech-qa` to merge it — a branch would strand with no owner. Commit it **directly to
-`main`** and push: no branch, no PR. If you're unsure whether code will follow, it will — take the
-branch.
+**The planning-only exception, in practice:** when no code will follow (a re-plan or story refresh, a
+status/doc correction, a standalone ADR), commit it **directly to `main`** and push instead of
+branching — no branch, no PR. If you're unsure whether code will follow, it will — take the branch.
 
 ## The story template
 
@@ -152,7 +150,7 @@ Confirm each in the story, or route a genuine deviation through the decision lan
 
 - **Tenancy** — {{TENANCY}}: every tenant-scoped row/read carries/filters the tenant key; nothing
   assumes a single tenant unless the project is single-tenant.
-- **The seams hold** — *(to define: the project's seam invariants — e.g. "sources stay behind the
+- **Seams stay sealed** — *(to define: the project's seam invariants — e.g. "sources stay behind the
   connector interface; consumers read only through {{ACCESS_LAYER}}, never raw tables." Fill from
   `architecture/00-overview.md` once the seams are defined.)*
 - **No schema change without the matching {{ACCESS_LAYER}} update** in the same change set.

@@ -36,10 +36,9 @@ own file at `backlog/<epic-dir>/<id>.md`, or `backlog/08-adhoc/<id>.md`.
 - **Story exists?** Re-read it now, in full. Its **This increment**, **Path to target**, **Acceptance
   criteria**, and any linked [`TECH-DEBT.md`](../../../TECH-DEBT.md) entries are your contract.
 
-**Then bind to the story's branch.** A story has **exactly one branch**, and `tech-planning` already
-opened it and pushed the plan commit there. You continue on *that* branch — never open a second one
-for a story that already has one (a separate plan branch and a separate code branch is two reviews and
-two merges for one story; the one-branch contract is what this replaces).
+**Then bind to the story's branch** — the one-branch-per-story contract is stated in full at
+[`CLAUDE.md`](../../../CLAUDE.md) §7.2; `tech-planning` already opened it and pushed the plan commit
+there. You continue on *that* branch, never a second one:
 
 - `git branch --show-current` must be the story's branch. If it isn't, `git fetch origin` and
   `git checkout <branch>` before writing a line of code.
@@ -119,13 +118,12 @@ merged or shipped — fresh eyes catch what your own confidence won't.
 ## Step 6 — Deliver: push and open the PR (the story's one PR)
 
 The moment the checks are green, deliver **without asking first** — don't offer a "push now vs QA vs
-continue" menu:
+continue" menu (the delivery contract this executes is stated once, at
+[`CLAUDE.md`](../../../CLAUDE.md) §7.2):
 
 - **Commit atomically** onto the story's branch — code + `PROJECT-STATUS.md` + any story/debt update,
   in one commit.
-- **Push**, then **open the PR**. This is the story's **single PR**, and it's born here: because the
-  branch also carries `tech-planning`'s plan commit, that one diff shows the *why* and the *what*
-  together.
+- **Push**, then **open the PR**. It's born here, on green — not before.
 - **Then wait for the nod** before [`tech-qa`](../tech-qa/SKILL.md) runs. On a PASS, `tech-qa` — not
   you — merges it.
 

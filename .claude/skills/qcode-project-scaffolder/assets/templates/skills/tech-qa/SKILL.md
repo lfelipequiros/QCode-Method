@@ -51,7 +51,8 @@ A static pass over the diff. Use the engine, then add the layer it doesn't know:
    git.)
 2. **Then check this project's invariants** `code-review` has no knowledge of (full detail in
    [`CLAUDE.md`](../../../CLAUDE.md) §6 and the [`architecture/`](../../../architecture/) ASD):
-   - **Seams sealed** — *(to define: the project's seam checks, from `architecture/`.)*
+   - **Seams stay sealed** — *(to define: the project's seam invariants, from `architecture/`. E.g.
+     "consumers read only through {{ACCESS_LAYER}}, never raw tables.")*
    - **Tenancy** — {{TENANCY}}: the tenant key on every tenant-scoped row/read.
    - **No schema change without the matching {{ACCESS_LAYER}} update** in the same change set.
    - **House standards** — {{HOUSE_STANDARDS}}; `{{TYPED_RESULT_NAME}}`, validation at boundaries,
@@ -122,7 +123,8 @@ hopeful one:
 A verdict is not an outcome. This section exists because a gate that ends in a *report* leaves the
 branch exactly where it was, and a PR nobody merges is indistinguishable from a PR nobody trusts.
 
-**On a PASS — complete the merge. This gate is the only one that merges.** Do not stop at "safe to
+**On a PASS — complete the merge. This gate is the only one that merges** (the delivery contract this
+executes is stated once, at [`CLAUDE.md`](../../../CLAUDE.md) §7.2). Do not stop at "safe to
 merge": on a PASS you merge to `main`, sync `main`, and delete the merged branch — yourself, in the
 same session, without offering a menu. The only things that stop you are a `tech-qa` **FAIL** (never
 merge a failed gate) or the user explicitly overriding for that PR. If the working tree holds

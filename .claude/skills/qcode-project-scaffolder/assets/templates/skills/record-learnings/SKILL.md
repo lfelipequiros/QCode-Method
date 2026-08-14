@@ -30,11 +30,11 @@ decides *what belongs where* and writes it there, **linking** between files rath
 copied fact is the drift bug the whole system designs against). If the destination already covers a
 learning, that's a no-op — say so and move on.
 
-**Where it sits in the lifecycle:** it is the **final step of the routine delivery flow** — `build →
-push + PR → review → tech-qa → merge → record-learnings`. `handoff` is **not** part of that routine:
-it's a separate, on-demand tool for specific topics (see "Not `handoff`" below), not an every-story
-step. *If* you do also write a handoff for the session, run this sweep first so the handoff can link to
-the ADR/debt rows it created (see [`CLAUDE.md`](../../../CLAUDE.md) §7).
+**Where it sits in the lifecycle:** it is the **final link in the canonical wrap-up sequence**, stated
+once at [`CLAUDE.md`](../../../CLAUDE.md) §7.3. `handoff` is **not** part of that chain: it's a
+separate, on-demand tool for specific topics (see "Not `handoff`" below), not an every-story step.
+*If* you do also write a handoff for the session, run this sweep first so the handoff can link to the
+ADR/debt rows it created.
 
 **Run it cheap.** This sweep is designed to work from *evidence* (git log, the diff, the live
 docs), not from the chat transcript — so its natural home is a **fresh session** (or right after

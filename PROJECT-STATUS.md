@@ -7,18 +7,17 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 
 **Updated:** 2026-08-14 · **Phase:** Building (epic 06) · **Branch:** `v2-extraction`
 
-- **Last shipped:** [05.4](backlog/epic-05-generation-engine/05.4.md) — `migrate` + `check` modes,
-  plus `sync` (folded in — the roadmap already committed epic 05 to all four modes, and 06.2's own
-  acceptance test needs it). QCode-Method's own v1-shaped board is now the ADR-059 shape you're
-  reading: this file, `backlog/CLOSED.md`, and every `backlog/epic-NN-slug/` directory are `migrate`'s
-  real output, not a simulation. The real run found and fixed a dozen bugs a synthetic fixture alone
-  didn't surface — a guard-string collision that silently dropped two bullets from this very section
-  on the first real pass, a missing operational-tooling install (this repo never had its own working
-  `board:check` until this story), and a genuine `check-links.mjs` gap once it ran unfiltered against
-  a real repo for the first time. `node scripts/board-check.mjs` now reports **the board is true**,
-  for real, from this repo's own root. **Epic 05 closes with this story.**
-- **Next up:** `06.1` — the `CLAUDE.md` template rewrite (the C8 fix: the canonical wrap-up sequence
-  stated exactly once).
+- **Last shipped:** [06.1](backlog/epic-06-assembly-and-release/06.1.md) — the `CLAUDE.md` template
+  rewrite. §7 expanded from a flat list into 11 numbered subsections; §7.2 is now the delivery
+  contract's one canonical statement, §7.3 is Fix C8's wrap-up chain (`product-check` → `tech-planning`
+  → `tech-build` → PR → `tech-qa` → merge → `record-learnings`, `handoff` explicitly off-spine), §7.7
+  is the repo-only memory routing table. Every gate template that used to restate the contract now
+  links to §7.2 instead. Verifying the link additions surfaced a real, pre-existing bug dating back to
+  03.1/03.3: `tech-qa`'s seam-invariant gap used different wording than `tech-planning`'s and
+  `tech-build`'s, so `qcode-charter`'s own documented grep for resolving it identically across all
+  three would have silently missed `tech-qa`'s copy. Fixed — all three now match.
+- **Next up:** `06.2` — docs, tokens, `skills-lock.json`, the `VERSION` 2.0.0 bump, and the real,
+  end-to-end day-one acceptance test. The release gate for the whole v2 extraction.
 
 ## Epics
 
@@ -29,7 +28,7 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 | 03 | The gates | `done` | [epic-03](backlog/epic-03-the-gates/README.md) |
 | 04 | The product layer | `done` | [epic-04](backlog/epic-04-product-layer/README.md) |
 | 05 | The generation engine | `done` | [epic-05](backlog/epic-05-generation-engine/README.md) |
-| 06 | Assembly & release | `planned` | [epic-06](backlog/epic-06-assembly-and-release/README.md) |
+| 06 | Assembly & release | `in-progress` | [epic-06](backlog/epic-06-assembly-and-release/README.md) |
 
 ## Active increments
 
