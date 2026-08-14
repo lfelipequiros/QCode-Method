@@ -153,7 +153,19 @@ discipline on FAIL that keeps the gate genuinely independent of the builder who 
   separate, explicit sentences — not implied by each other.
 - Merge authority is stated as this gate's alone.
 
-### 03.4 — `compass-check` + `record-learnings` reconciliation
+#### Closed: 03.3 — 2026-08-14
+
+Built directly. All four acceptance criteria confirmed by direct grep, not assumed from the diff:
+the three-place close is fully spelled out (board deletion, one `CLOSED.md` row, story-file
+narrative); the FAIL path's no-self-chaining and closed-only-by-a-later-PASS rules are separate
+sentences in two different sections (the verdict itself, and "after the verdict"), not folded into
+one; merge authority ("this gate is the only one that merges") is stated explicitly.
+
+**Closes a thread left open since 02.3.** That story's closure notes recorded a deliberate,
+tracked gap: `tech-qa`'s old PASS description ("move it from Active increments to Recently done")
+described full v1 close *behavior*, not a stray word, so a shallow prose patch at 02.1/02.2 time
+would have half-implemented what this story does properly. Confirmed by grep: zero remaining
+occurrences of "Recently done" in the rewritten file.
 
 **What & why.** `compass-check` needs to read the new closed/accepted indexes and add
 `board:check` as the mechanized half of its own reconcile step; `record-learnings` needs its

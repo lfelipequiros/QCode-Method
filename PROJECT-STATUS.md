@@ -13,13 +13,14 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 
 **Updated:** 2026-08-14 · **Phase:** Building (epic 03) · **Branch:** `v2-extraction`
 
-- **Last shipped:** [03.2](backlog/epic-03-the-gates.md#032--tech-build-rewrite) — `tech-build` now
-  binds to the story's one branch at Step 1, carries a fourth divergence lane (Design decision,
-  distinct from a forced shortcut — hands back to `tech-planning`'s ADR bridge), and auto-delivers
-  on green (commit, push, open the story's single PR, no menu).
-- **Next up:** `03.3` — the `tech-qa` rewrite: numbered QA rounds, the three-place close (delete the
-  board row → append to `CLOSED.md` → narrate on the story file), and merge authority (the only
-  gate that merges, on PASS).
+- **Last shipped:** [03.3](backlog/epic-03-the-gates.md#033--tech-qa-rewrite) — `tech-qa` now runs
+  numbered rounds, closes a PASS in three places (delete the board row → one `CLOSED.md` row →
+  narrate on the story file), and is the only gate that merges. The FAIL discipline (no
+  self-chaining, closed only by a later recorded PASS) is now explicit. This also resolves the
+  "Recently done" gap 02.3 deliberately left open for this story to own.
+- **Next up:** `03.4` — `compass-check` + `record-learnings` reconciliation: read the new
+  closed/accepted indexes, add `board:check` to the reconcile step, and fix C9 (write-boundary
+  precedence now that `product-check` is about to become a third writer into the backlog).
 
 ## Epics
 
@@ -39,12 +40,13 @@ the story in its epic.
 
 | Story | Status | Link |
 |-------|--------|------|
-| 03.3 | `in-progress` | [epic-03 § 03.3](backlog/epic-03-the-gates.md#033--tech-qa-rewrite) |
+| 03.4 | `in-progress` | [epic-03 § 03.4](backlog/epic-03-the-gates.md#034--compass-check--record-learnings-reconciliation) |
 
 ## Recently done — the increment log
 
 | Story | Date | Detail |
 |-------|------|--------|
+| 03.3 | 2026-08-14 | [epic-03 § 03.3](backlog/epic-03-the-gates.md#033--tech-qa-rewrite) — QA rounds, three-place close, merge authority |
 | 03.2 | 2026-08-14 | [epic-03 § 03.2](backlog/epic-03-the-gates.md#032--tech-build-rewrite) — branch binding, 4th divergence lane, deliver/PR step |
 | 03.1 | 2026-08-14 | [epic-03 § 03.1](backlog/epic-03-the-gates.md#031--tech-planning-rewrite) — story-as-file, four-lane routing, ADR bridge, branch contract |
 | 02.4 | 2026-08-14 | [epic-02 § 02.4](backlog/epic-02-shape-and-enforcement.md#024--cockpit-evolution) — cockpit imports board-check's parsers, done/in-progress/flagged verified with synthetic data |
