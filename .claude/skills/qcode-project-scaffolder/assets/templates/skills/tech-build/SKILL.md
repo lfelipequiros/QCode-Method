@@ -27,7 +27,7 @@ reverse-engineer why the code doesn't match the plan.
 ## Step 1 — Require an approved story (the binding)
 
 Before writing any code, confirm there is an **approved `tech-planning` story** for this work — in the
-matching epic or in [`backlog/08-adhoc.md`](../../../backlog/08-adhoc.md).
+matching epic or in [`backlog/08-adhoc/`](../../../backlog/08-adhoc/).
 
 - **No story, or an unapproved one?** Stop and hand off to [`tech-planning`](../tech-planning/SKILL.md).
   (A throwaway spike the user explicitly labeled is the only exception, and what you learn still

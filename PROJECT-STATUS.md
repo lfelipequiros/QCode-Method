@@ -13,11 +13,11 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 
 **Updated:** 2026-08-13 · **Phase:** Building (epic 02) · **Branch:** `v2-extraction`
 
-- **Last shipped:** [01.1](backlog/epic-01-secure-base.md) — v1.0.2 committed to `main`
-  (token/context discipline), the `v2-extraction` branch opened, this board and backlog bootstrapped.
-- **Next up:** epic 02, story by story — `02.1` (the ADR-059 shape), then `02.2`–`02.4`
-  (enforcement + cockpit). Each story runs as one subagent implementation pass, QA'd against its
-  own acceptance criteria before the next one starts.
+- **Last shipped:** [02.1](backlog/epic-02-shape-and-enforcement.md#021--information-architecture-the-adr-059-shape) —
+  the ADR-059 shape landed in the scaffolder templates: open-work-only board, `CLOSED.md` /
+  `ACCEPTED.md`, epic-01-foundation split into per-story files, the ad-hoc bucket restructured.
+- **Next up:** `02.2` — port `board-check.mjs` + its fixture tests, so the shape 02.1 just wrote
+  becomes machine-checked rather than merely documented.
 
 ## Epics
 
@@ -37,12 +37,13 @@ the story in its epic.
 
 | Story | Status | Link |
 |-------|--------|------|
-| *(none pulled yet — 02.1 is next)* | | |
+| 02.2 | `in-progress` | [epic-02 § 02.2](backlog/epic-02-shape-and-enforcement.md#022--port-board-checkmjs--fixture-tests) |
 
 ## Recently done — the increment log
 
 | Story | Date | Detail |
 |-------|------|--------|
+| 02.1 | 2026-08-13 | [epic-02 § 02.1](backlog/epic-02-shape-and-enforcement.md#021--information-architecture-the-adr-059-shape) — the ADR-059 shape in the scaffolder templates |
 | 01.1 | 2026-08-13 | [epic-01 § 01.1](backlog/epic-01-secure-base.md#011--commit-token-discipline-v102-branch-bootstrap-the-board) — v1.0.2 + branch + board bootstrap |
 
 ## How status works

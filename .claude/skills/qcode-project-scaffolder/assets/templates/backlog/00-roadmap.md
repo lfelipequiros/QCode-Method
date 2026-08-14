@@ -5,13 +5,14 @@ were made. The [architecture/](../architecture/) ASD is the reference for *what 
 backlog is *what we build next*. Each epic links to its own file with stories and acceptance criteria.
 
 > **Status:** Backlog defined, not started. No code is written until an epic is pulled and its stories
-> approved (plan-first — `tech-planning`).
+> approved (plan-first — `tech-planning`). For the board shape — open work here, closed work in an
+> append-only index — see [`PROJECT-STATUS.md`](../PROJECT-STATUS.md), documented once, there.
 
 ## Epic map
 
 | # | Epic | Outcome | Value archetype | Depends on |
 |---|---|---|---|---|
-| 01 | **Foundation** | The skeleton everything hangs on: repo structure, data layer, the seam(s), secrets, CI. | Enabler (gates all later value) | — |
+| 01 | [**Foundation**](epic-01-foundation/README.md) | The skeleton everything hangs on: repo structure, data layer, the seam(s), secrets, CI. | Enabler (gates all later value) | — |
 {{EPIC_TABLE_ROADMAP}}
 
 *(to define: epics 02+ — name each one's outcome, value archetype, and dependency during planning.

@@ -44,11 +44,12 @@ you're unsure whether something is "real code," it is — run the gate.
    specific ADRs the story touches** (by seam/topic) instead of reading
    [`architecture/01-principles-and-decisions.md`](../../../architecture/01-principles-and-decisions.md)
    wholesale — cite what you actually loaded. From [`PROJECT-STATUS.md`](../../../PROJECT-STATUS.md)
-   read only the epic table + *Active increments* (not the history — archive it once the "Recently
-   done" log grows long).
-2. **Place the work.** If it advances an existing epic, **append the story to that epic file**. If it
-   fits none, append to **[`backlog/08-adhoc.md`](../../../backlog/08-adhoc.md)**. Never invent a
-   parallel planning system. **Register it on the board** — add/confirm the epic in
+   read only the epic table + *Active increments* — that's the whole board now; shipped work lives in
+   [`backlog/CLOSED.md`](../../../backlog/CLOSED.md) and isn't relevant to planning what's next.
+2. **Place the work.** If it advances an existing epic, **create a new story file in that epic's
+   directory**. If it fits none, create a new story file in
+   **[`backlog/08-adhoc/`](../../../backlog/08-adhoc/)**. Never invent a parallel planning system.
+   **Register it on the board** — add/confirm the epic in
    [`PROJECT-STATUS.md`](../../../PROJECT-STATUS.md), the *only* place status lives. The story itself
    carries **no status line** (zero duplication).
 3. **Draft the story** using the template below. The target → increment → path section is the heart.

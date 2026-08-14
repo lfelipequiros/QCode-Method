@@ -82,9 +82,10 @@ instead of a generic assistant.
 
 Read the live state, then reconcile it against the repo so you never advise off a stale board:
 
-- [PROJECT-STATUS.md](../../../PROJECT-STATUS.md) — phase, active, next, the epic table, recently done.
+- [PROJECT-STATUS.md](../../../PROJECT-STATUS.md) — phase, active, next, the epic table. What's
+  **shipped** is no longer here — read [backlog/CLOSED.md](../../../backlog/CLOSED.md) for that.
 - [backlog/](../../../backlog/) — the sequenced plan, the dependency chain, and the
-  [08-adhoc](../../../backlog/08-adhoc.md) parking-lot of candidate work.
+  [08-adhoc](../../../backlog/08-adhoc/README.md) parking-lot of candidate work.
 - [OPEN-QUESTIONS.md](../../../OPEN-QUESTIONS.md) — external blockers only {{OWNER_NAME}} can clear.
 - [TECH-DEBT.md](../../../TECH-DEBT.md) — shortcuts and their paydown triggers. **Don't just read it —
   walk it item by item.** For every `open` entry, evaluate its **paydown trigger against the current

@@ -28,7 +28,7 @@ adversarial eyes — where the bugs the builder's confidence glossed over actual
 ## Precondition: know what "done" means
 
 Load the approved [`tech-planning`](../tech-planning/SKILL.md) story — in its epic or in
-[`backlog/08-adhoc.md`](../../../backlog/08-adhoc.md). Its **acceptance criteria**, **increment**,
+[`backlog/08-adhoc/`](../../../backlog/08-adhoc/). Its **acceptance criteria**, **increment**,
 **path-to-target**, and linked [`TECH-DEBT.md`](../../../TECH-DEBT.md) entries are the spec you're
 checking against. No story? The work skipped the gates — flag it and route back through
 `tech-planning`, because you have nothing objective to verify against.

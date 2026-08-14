@@ -122,6 +122,30 @@ survive being run against a project that has shipped nothing yet.
 - Running it against a `CLOSED.md` with zero bytes / missing entirely still fails loudly.
 - `status-vocab.mjs` is imported, not redeclared.
 
-#### Closed: 02.1–02.4
+#### Closed: 02.1 — 2026-08-13
 
-_Filled in as each story's subagent pass is QA'd and lands._
+Built by subagent, QA'd by the orchestrating session. All four self-checks from the story brief
+passed: zero stale flat-path references, all 5 original `01.X` stories preserved 1:1 as their own
+files, the status vocabulary present verbatim, full file list matches the story's file-by-file spec.
+
+Two judgment calls resolved directly by the orchestrator rather than sent back for a second pass:
+- **`product-check` wording** — the subagent hedged ("an upstream product-intake gate, if the
+  project runs one") to avoid assuming a not-yet-built skill. Since product-check ships **core** in
+  epic 04 (decided, not optional) and the alias two lines below already names it directly
+  (`needs product-check` → `raised`), the hedge read as inconsistent within the same paragraph.
+  Reworded to name `product-check` directly, matching the templates' intended final (v2.0.0) shape
+  rather than this mid-build transitional state.
+- **Stale "Recently done" prose** — found in 5 places, not fully rewritten. `tech-planning` and
+  `compass-check` had one-line reading-list mentions with no real behavior attached — fixed
+  directly, in scope for this story. `githooks/pre-commit` and `cockpit/generate.mjs` are
+  correctly deferred to 02.3/02.4 (functional rewrites, not prose). **`tech-qa`'s PASS section
+  was deliberately left untouched** — its "Recently done" mention isn't a stray word, it's
+  describing the entire v1 close procedure (move a row from Active to Recently-done), which is
+  exactly what 03.3's three-place close (delete from board → append to CLOSED.md → narrate on the
+  story file) is chartered to replace in full. Patching it now would mean two different
+  half-descriptions of "how to close a story" across two stories; leaving it as a known,
+  temporary inconsistency for 03.3 to resolve properly is the more honest state.
+
+Also fixed at QA time: `00-roadmap.md`'s Foundation row had no markdown link at all in the
+original (contrary to the file's own stated promise) — the subagent added one rather than
+"repointing" something that never existed, which is the more correct read of the intent.

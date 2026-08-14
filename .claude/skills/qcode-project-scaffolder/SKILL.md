@@ -117,8 +117,10 @@ leaving every `(to define: …)` gap in place. Create directories as needed.
 | `gitattributes` | `.gitattributes` |
 | `package.json` | `package.json` |
 | `backlog/00-roadmap.md` | `backlog/00-roadmap.md` |
-| `backlog/epic-01-foundation.md` | `backlog/epic-01-foundation.md` |
-| `backlog/08-adhoc.md` | `backlog/08-adhoc.md` |
+| `backlog/CLOSED.md` | `backlog/CLOSED.md` |
+| `backlog/ACCEPTED.md` | `backlog/ACCEPTED.md` |
+| `backlog/epic-01-foundation/` *(directory — copy every file inside, preserving structure)* | `backlog/epic-01-foundation/` |
+| `backlog/08-adhoc/` *(directory — copy every file inside, preserving structure)* | `backlog/08-adhoc/` |
 | `architecture/00-overview.md` | `architecture/00-overview.md` |
 | `architecture/01-principles-and-decisions.md` | `architecture/01-principles-and-decisions.md` |
 | `handoffs/README.md` | `handoffs/README.md` |
