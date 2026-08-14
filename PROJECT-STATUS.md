@@ -5,74 +5,55 @@ lives**. Owns exactly one thing — the status of epics and increments — and l
 else. QCode-Method now dogfoods its own method: this board tracks the v2 extraction plan's six
 epics and sixteen stories, built on the `v2-extraction` branch.
 
-> **v1 board shape, deliberately.** This board uses the pre-ADR-059 flat shape (epics as single
-> files, a "Recently done" log here) because the v2 engine that would produce the ADR-059 shape
-> doesn't exist until epic 05 ships. Once it does, this repo becomes `migrate` mode's first test
-> subject (see [05.4](backlog/epic-05-generation-engine.md#054--migrate--check-modes)) — proving
-> the v1→v2 path on itself before it's ever run against a consumer project.
+**Updated:** 2026-08-14 · **Phase:** Building (epic 06) · **Branch:** `v2-extraction`
 
-**Updated:** 2026-08-14 · **Phase:** Building (epic 05) · **Branch:** `v2-extraction`
-
-- **Last shipped:** [05.3](backlog/epic-05-generation-engine.md#053--qcode-charter-skill--the-charter) —
-  `qcode-charter`, the judgment-interview half of bootstrapping, plus the scaffolder orchestrator
-  rewritten down to five steps now that `generate` and `qcode-charter` do all the real work. A real
-  `generate` run (not just the unit suite) caught a genuine bug the tests alone missed: the new
-  skill's own prose used live `{{TOKEN}}` syntax to *talk about* fields, which the renderer
-  substituted for real, silently dropping the file from every scaffold. Fixed, plus two stale docs
-  (`README.md`, `docs/updating-projects.md`) that still described the old copy-the-folder,
-  single-interview workflow.
-- **Next up:** `05.4` — `migrate` + `check` modes. QCode-Method's own v1-shaped board becomes
-  `migrate`'s first test subject, proving the v1→v2 path on itself before it ever runs against a
-  consumer project.
+- **Last shipped:** [05.4](backlog/epic-05-generation-engine/05.4.md) — `migrate` + `check` modes,
+  plus `sync` (folded in — the roadmap already committed epic 05 to all four modes, and 06.2's own
+  acceptance test needs it). QCode-Method's own v1-shaped board is now the ADR-059 shape you're
+  reading: this file, `backlog/CLOSED.md`, and every `backlog/epic-NN-slug/` directory are `migrate`'s
+  real output, not a simulation. The real run found and fixed a dozen bugs a synthetic fixture alone
+  didn't surface — a guard-string collision that silently dropped two bullets from this very section
+  on the first real pass, a missing operational-tooling install (this repo never had its own working
+  `board:check` until this story), and a genuine `check-links.mjs` gap once it ran unfiltered against
+  a real repo for the first time. `node scripts/board-check.mjs` now reports **the board is true**,
+  for real, from this repo's own root. **Epic 05 closes with this story.**
+- **Next up:** `06.1` — the `CLAUDE.md` template rewrite (the C8 fix: the canonical wrap-up sequence
+  stated exactly once).
 
 ## Epics
 
 | # | Epic | Status | Detail |
 |---|------|--------|--------|
-| 01 | Secure the base, stand up the board | `done` | [epic-01](backlog/epic-01-secure-base.md) |
-| 02 | The shape and its enforcement | `done` | [epic-02](backlog/epic-02-shape-and-enforcement.md) |
-| 03 | The gates | `done` | [epic-03](backlog/epic-03-the-gates.md) |
-| 04 | The product layer | `done` | [epic-04](backlog/epic-04-product-layer.md) |
-| 05 | The generation engine | `in-progress` | [epic-05](backlog/epic-05-generation-engine.md) |
-| 06 | Assembly & release | `planned` | [epic-06](backlog/epic-06-assembly-and-release.md) |
+| 01 | Secure the base, stand up the board | `done` | [epic-01](backlog/epic-01-secure-base/README.md) |
+| 02 | The shape and its enforcement | `done` | [epic-02](backlog/epic-02-shape-and-enforcement/README.md) |
+| 03 | The gates | `done` | [epic-03](backlog/epic-03-the-gates/README.md) |
+| 04 | The product layer | `done` | [epic-04](backlog/epic-04-product-layer/README.md) |
+| 05 | The generation engine | `done` | [epic-05](backlog/epic-05-generation-engine/README.md) |
+| 06 | Assembly & release | `planned` | [epic-06](backlog/epic-06-assembly-and-release/README.md) |
 
 ## Active increments
 
 Stories that are `in-progress` or `in-qa` appear here once pulled, with their status and a link to
-the story in its epic.
+the story in its epic. **None yet.**
 
-| Story | Status | Link |
-|-------|--------|------|
-| 05.4 | `in-progress` | [epic-05 § 05.4](backlog/epic-05-generation-engine.md#054--migrate--check-modes) |
+## Needs status review
 
-## Recently done — the increment log
-
-| Story | Date | Detail |
-|-------|------|--------|
-| 05.3 | 2026-08-14 | [epic-05 § 05.3](backlog/epic-05-generation-engine.md#053--qcode-charter-skill--the-charter) — qcode-charter skill, orchestrator slimmed to 5 steps, a real generate run caught a live-token-in-prose bug, 2 stale docs fixed |
-| 05.2 | 2026-08-14 | [epic-05 § 05.2](backlog/epic-05-generation-engine.md#052--generate-mode--the-scaffold) — qcode.mjs generate, 3 more real bugs found and fixed, 40 tests total |
-| 05.1 | 2026-08-14 | [epic-05 § 05.1](backlog/epic-05-generation-engine.md#051--the-unified-renderer-core) — lib/qcode-core.mjs, 35 tests, 4 real bugs found and fixed |
-| 04.1 | 2026-08-14 | [epic-04 § 04.1](backlog/epic-04-product-layer.md#041--generalize-product-check--its-trackers) — product-check generalized, PDR log + surface map shipped |
-| 03.4 | 2026-08-14 | [epic-03 § 03.4](backlog/epic-03-the-gates.md#034--compass-check--record-learnings-reconciliation) — ACCEPTED.md + board:check in the reconcile, repo-only memory, C9 write boundaries |
-| 03.3 | 2026-08-14 | [epic-03 § 03.3](backlog/epic-03-the-gates.md#033--tech-qa-rewrite) — QA rounds, three-place close, merge authority |
-| 03.2 | 2026-08-14 | [epic-03 § 03.2](backlog/epic-03-the-gates.md#032--tech-build-rewrite) — branch binding, 4th divergence lane, deliver/PR step |
-| 03.1 | 2026-08-14 | [epic-03 § 03.1](backlog/epic-03-the-gates.md#031--tech-planning-rewrite) — story-as-file, four-lane routing, ADR bridge, branch contract |
-| 02.4 | 2026-08-14 | [epic-02 § 02.4](backlog/epic-02-shape-and-enforcement.md#024--cockpit-evolution) — cockpit imports board-check's parsers, done/in-progress/flagged verified with synthetic data |
-| 02.3 | 2026-08-14 | [epic-02 § 02.3](backlog/epic-02-shape-and-enforcement.md#023--rebuild-the-guard-as-a-shared-predicate) — status-guard.sh, check-links.mjs, index-backlog.mjs, CI template |
-| 02.2 | 2026-08-13 | [epic-02 § 02.2](backlog/epic-02-shape-and-enforcement.md#022--port-board-checkmjs--fixture-tests) — board-check.mjs, 7 rules, 39 tests |
-| 02.1 | 2026-08-13 | [epic-02 § 02.1](backlog/epic-02-shape-and-enforcement.md#021--information-architecture-the-adr-059-shape) — the ADR-059 shape in the scaffolder templates |
-| 01.1 | 2026-08-13 | [epic-01 § 01.1](backlog/epic-01-secure-base.md#011--commit-token-discipline-v102-branch-bootstrap-the-board) — v1.0.2 + branch + board bootstrap |
+Stories the board can't confirm — a claimed status with no merged PR behind it. A to-do list, not a
+status: resolve each by checking the PR/branch and correcting or removing the row. **None yet.**
 
 ## How status works
 
 - **Vocabulary:** `planned` → `in-progress` → `in-qa` → `done`, plus `blocked` and `deferred`.
 - **Status lives only here** (zero duplication). Stories in the epic files carry no status line; a
   story that isn't listed individually inherits its epic's status.
-- A story gets its own row under **Active increments** when its subagent pass starts, then moves to
-  **Recently done** once its QA pass confirms the acceptance criteria and it's committed.
+- A story gets its own row under **Active increments** when work starts. It comes **off** this board —
+  never into a "done" section here — the moment `tech-qa` passes it: that same commit appends its row
+  to [`backlog/CLOSED.md`](backlog/CLOSED.md) and flips it to `done`.
 
 ## Where the detail lives
 
+- **Closed work (shipped stories)** → [backlog/CLOSED.md](backlog/CLOSED.md) — append-only index.
+- **Accepted-but-not-yet-planned decisions** → [backlog/ACCEPTED.md](backlog/ACCEPTED.md)
 - **The plan** → [backlog/00-roadmap.md](backlog/00-roadmap.md) + the six epic files
 - **The reasoning behind the shape** → the extraction plan artifact (published 2026-08-13,
   decisions-closed revision) — cited from each story rather than restated

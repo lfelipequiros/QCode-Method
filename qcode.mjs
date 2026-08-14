@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 // qcode.mjs — the QCode-Method CLI.
 //
-// Modes: `generate` (this story, 05.2). `sync`/`migrate`/`check` follow in 05.4 — until then,
-// `scripts/qcode-sync.mjs` remains the way to pull updates into an already-scaffolded project.
+// Four modes, one renderer: `generate` (05.2), `sync`/`migrate`/`check` (05.4). `scripts/qcode-sync.mjs`
+// is superseded by `sync` below — same behavior, now built on the shared lib/qcode-core.mjs engine
+// instead of its own hand-maintained MANAGED file list (see that script's own header for the retirement
+// note).
 //
 //   node qcode.mjs generate <target-dir> [options]
 //
@@ -29,13 +31,23 @@
 //
 // Zero dependencies beyond Node itself and `git` on PATH (for the optional --git step).
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, chmodSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, chmodSync, readdirSync, statSync, rmSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { dirname, resolve, join } from 'node:path';
+import { dirname, resolve, join, relative, basename } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 
-import { renderProject, renderPackageJson, CONFIG_VERSION } from './lib/qcode-core.mjs';
+import { renderProject, renderPackageJson, resolveManifest, loadConfig, CONFIG_VERSION } from './lib/qcode-core.mjs';
+import {
+  parseV1Epic,
+  parseEpicFilename,
+  renderStoryFile,
+  renderEpicReadme,
+  renderClosedRow,
+  compareStoryIds,
+  parseEpicsTable,
+  parseRecentlyDone,
+} from './lib/qcode-migrate.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)));
 const TEMPLATES = join(ROOT, '.claude/skills/qcode-project-scaffolder/assets/templates');
@@ -82,6 +94,8 @@ function parseArgs(argv) {
     else if (a === '--compass-check') args.compassCheck = true;
     else if (a === '--no-compass-check') args.compassCheck = false;
     else if (a === '--yes') args.yes = true;
+    else if (a === '--write') args.write = true;
+    else if (a === '--force') args.force = true;
     else if (a.startsWith('--')) {
       const key = a.slice(2).replace(/-([a-z])/g, (_, c) => c.toUpperCase());
       args[key] = argv[++i];
@@ -283,15 +297,413 @@ async function generate(args) {
   }
 }
 
+// ── sync ─────────────────────────────────────────────────────────────────────────────────────────
+//
+//   node qcode.mjs sync <project-dir> [--write] [--force]
+//
+// Re-renders every framework-owned file (lib/qcode-core.mjs's isFrameworkOwned — skills/, githooks/,
+// ci/, scripts/, cockpit/) against the project's own recorded tokens. Dry-run by default; --write
+// applies, backing up every changed file first (the existing `.qcode-bak` convention). A file the
+// project has declared `customized` in its config is reported but never overwritten without --force.
+
+async function sync(args) {
+  const targetArg = args._[0];
+  if (!targetArg) die('usage: node qcode.mjs sync <project-dir> [--write] [--force]');
+  const projectDir = resolve(targetArg);
+  const write = !!args.write;
+  const force = !!args.force;
+
+  const config = loadConfig(projectDir);
+  if (!config) die(`no .qcode/config.json at ${projectDir} — not a qcode-method project (run generate first)`);
+
+  console.log(`\nQCode-Method sync — ${projectDir}`);
+  console.log(write ? '(writing)\n' : '(dry-run — pass --write to apply)\n');
+
+  const report = renderProject({
+    templatesRoot: TEMPLATES,
+    projectRoot: projectDir,
+    tokens: config.tokens,
+    config,
+    write,
+    force,
+    filterOwner: 'framework',
+  });
+
+  console.log(`  created         : ${report.created.length}`);
+  console.log(`  updated         : ${report.updated.length}`);
+  console.log(`  up to date      : ${report.upToDate.length}`);
+  console.log(`  customized      : ${report.customized.length}${report.customized.length ? ' (skipped — pass --force to overwrite)' : ''}`);
+  if (report.skippedMissingTokens.length) {
+    console.log(`  ⚠ skipped (missing token — a qcode.mjs bug, please report): ${report.skippedMissingTokens.length}`);
+  }
+
+  for (const e of [...report.updated, ...report.customized]) {
+    const tag = report.customized.includes(e) ? ' [CUSTOMIZED]' : '';
+    console.log(`\n--- ${e.targetRelPath}${tag}\n${e.diff}`);
+  }
+
+  if (write) {
+    const frameworkVersion = readFileSync(join(ROOT, 'VERSION'), 'utf8').trim();
+    const newConfig = { ...config, frameworkVersion, syncedAt: new Date().toISOString().slice(0, 10) };
+    mkdirSync(join(projectDir, '.qcode'), { recursive: true });
+    writeFileSync(join(projectDir, '.qcode/config.json'), JSON.stringify(newConfig, null, 2) + '\n');
+    console.log(`\n✅ synced — .qcode/config.json now records frameworkVersion ${frameworkVersion}.`);
+  } else {
+    console.log(`\nDry run only — pass --write to apply.`);
+  }
+}
+
+// ── check ────────────────────────────────────────────────────────────────────────────────────────
+//
+//   node qcode.mjs check <project-dir>
+//
+// Two distinct signals, reported separately, because an incomplete-but-valid project is not the
+// same as a broken one: STRUCTURAL VALIDITY (board:check passes, cockpit renders — reuses generate's
+// own selfTest, so "valid" means the same thing in both modes) and COMPLETENESS (how many
+// `(to define: ...)` gaps remain anywhere in the tree — a plain recursive walk, not the render
+// manifest, since `check` runs against a project that may have drifted from any single template
+// snapshot). Exit code reflects structural validity only; an open gap count is never a failure.
+
+function countDefineGapsInTree(projectDir) {
+  const SKIP_DIRS = new Set(['.git', 'node_modules', '.qcode-bak']);
+  let count = 0;
+  const walk = (dir) => {
+    for (const entry of readdirSync(dir)) {
+      if (SKIP_DIRS.has(entry)) continue;
+      const abs = join(dir, entry);
+      const st = statSync(abs);
+      if (st.isDirectory()) walk(abs);
+      else if (entry.endsWith('.md')) {
+        const matches = readFileSync(abs, 'utf8').match(/\(to define:/g);
+        if (matches) count += matches.length;
+      }
+    }
+  };
+  walk(projectDir);
+  return count;
+}
+
+async function check(args) {
+  const targetArg = args._[0];
+  if (!targetArg) die('usage: node qcode.mjs check <project-dir>');
+  const projectDir = resolve(targetArg);
+
+  // Deliberately NOT gated on .qcode/config.json — unlike sync (which genuinely can't function
+  // without the recorded tokens it re-renders from), check's two jobs (self-test, gap-count) are
+  // both plain filesystem operations that need no config at all. QCode-Method's own repo is the
+  // proof this matters: it was hand-bootstrapped by story 01.1, never run through `generate`, so it
+  // has no config.json — yet this story's own acceptance criteria require `qcode check .` to work
+  // against it right after migrate. PROJECT-STATUS.md's presence is the real "is this a
+  // qcode-method project" signal, matching the same gate migrate itself uses.
+  if (!existsSync(join(projectDir, 'PROJECT-STATUS.md'))) {
+    die(`no PROJECT-STATUS.md at ${projectDir} — not a qcode-method project`);
+  }
+  const config = loadConfig(projectDir);
+
+  console.log(`\nQCode-Method check — ${projectDir}`);
+  console.log(config ? `(config.json: frameworkVersion ${config.frameworkVersion})\n` : '(no .qcode/config.json — a hand-bootstrapped project, not a generated one)\n');
+
+  const problems = selfTest(projectDir);
+  const structurallyValid = problems.length === 0;
+
+  if (structurallyValid) {
+    console.log('✅ structurally valid — board:check passes, cockpit renders clean.');
+  } else {
+    console.log('❌ NOT structurally valid:');
+    for (const p of problems) console.log(`\n${p}`);
+  }
+
+  const gapCount = countDefineGapsInTree(projectDir);
+  console.log(`\n${gapCount} (to define) gap(s) open.`);
+  console.log(
+    gapCount === 0
+      ? 'Complete — every judgment gap has been resolved.'
+      : 'Incomplete but valid: run qcode-charter (or resolve the gaps directly) to close them — an\nopen gap is not the same failure as a structural break.'
+  );
+
+  process.exit(structurallyValid ? 0 : 1);
+}
+
+// ── migrate ──────────────────────────────────────────────────────────────────────────────────────
+//
+//   node qcode.mjs migrate <project-dir> [--write]
+//
+// Converts a v1-shaped backlog (flat `backlog/epic-NN-slug.md` files, a "Recently done" log on
+// PROJECT-STATUS.md) into the v2 ADR-059 shape (story-is-a-file, an open-work-only board, an
+// append-only `backlog/CLOSED.md`). Dry-run by default — always inspect the plan before --write.
+//
+// Built on T9's discipline (Mompa's own ten single-use migration scripts): split flat files, derive
+// index rows from structure (never invent one — lib/qcode-migrate.mjs's renderEpicReadme takes only
+// the id + the story's own title), verify relocation losslessly. The splitting/parsing logic itself
+// lives in lib/qcode-migrate.mjs as pure, unit-tested functions (see qcode-migrate.test.mjs,
+// including the two real shapes this repo's own epic-02 and epic-03 files exercise: closures that
+// land out of story order, and a closure block sitting textually before its own story heading) —
+// this function is the thin, file-system-touching orchestration around it.
+
+async function migratePlan(projectDir) {
+  const backlogDir = join(projectDir, 'backlog');
+  const statusPath = join(projectDir, 'PROJECT-STATUS.md');
+  if (!existsSync(statusPath)) die(`no PROJECT-STATUS.md at ${projectDir} — not a qcode-method project`);
+  if (existsSync(join(backlogDir, 'CLOSED.md'))) {
+    return { alreadyMigrated: true };
+  }
+
+  const epicFiles = readdirSync(backlogDir).filter((f) => /^epic-\d{2}-[a-z0-9-]+\.md$/.test(f)).sort();
+  if (!epicFiles.length) die(`no flat backlog/epic-NN-*.md files found under ${backlogDir} — nothing to migrate`);
+
+  const statusMd = readFileSync(statusPath, 'utf8');
+  const epicsTableRows = parseEpicsTable(statusMd);
+  const recentlyDone = parseRecentlyDone(statusMd);
+
+  const epics = epicFiles.map((file) => {
+    const { slug, num } = parseEpicFilename(file);
+    return { file, slug, num, ...parseV1Epic(readFileSync(join(backlogDir, file), 'utf8')) };
+  });
+  const slugByNum = new Map(epics.map((e) => [e.num, e.slug]));
+
+  // Cross-validate the two independent sources of "what's closed" before trusting either — a
+  // mismatch here is a real data problem worth surfacing, not something to silently paper over.
+  const closureIds = new Set(epics.flatMap((e) => e.closures.map((c) => c.id)));
+  const recentIds = new Set(recentlyDone.map((r) => r.id));
+  const warnings = [];
+  for (const id of closureIds) if (!recentIds.has(id)) warnings.push(`${id} has a #### Closed block in its epic file but no row in PROJECT-STATUS.md's Recently-done table`);
+  for (const id of recentIds) if (!closureIds.has(id)) warnings.push(`${id} has a Recently-done row but no #### Closed block in any epic file`);
+  for (const stub of epics.flatMap((e) => e.droppedStubs)) warnings.push(`dropped a non-story-id "#### Closed:" heading (expected — a not-yet-filled-in placeholder): ${stub}`);
+
+  const writes = [];
+  const deletes = [];
+
+  for (const epic of epics) {
+    const storiesById = new Map(epic.stories.map((s) => [s.id, s]));
+    const closuresById = new Map(epic.closures.map((c) => [c.id, c]));
+    const storyOrder = [...storiesById.keys()].sort(compareStoryIds);
+
+    for (const id of storyOrder) {
+      writes.push({ path: `backlog/${epic.slug}/${id}.md`, content: renderStoryFile(storiesById.get(id), closuresById.get(id) ?? null) });
+    }
+    writes.push({ path: `backlog/${epic.slug}/README.md`, content: renderEpicReadme({ title: epic.title, preamble: epic.preamble, storyOrder, storiesById }) });
+    deletes.push(`backlog/${epic.file}`);
+  }
+
+  // backlog/CLOSED.md — template boilerplate header (append-only rules, universal across every
+  // migrated project) + one row per Recently-done entry, in its existing (already-chronological)
+  // order, each Detail link recomputed directly from the id rather than reverse-parsed from the
+  // old anchor — simpler and can't drift from what the row actually says its id is.
+  const closedTemplate = readFileSync(join(TEMPLATES, 'backlog/CLOSED.md'), 'utf8');
+  const sepLine = '|---|---|---|---|';
+  const closedHeader = closedTemplate.slice(0, closedTemplate.indexOf(sepLine) + sepLine.length);
+  const closedRows = recentlyDone.map((r) => {
+    const slug = slugByNum.get(r.id.split('.')[0]);
+    return renderClosedRow({ id: r.id, date: r.date, detailLinkText: r.detailText, detailHref: slug ? `${slug}/${r.id}.md` : r.detailHref });
+  });
+  writes.push({ path: 'backlog/CLOSED.md', content: `${closedHeader}\n${closedRows.join('\n')}\n` });
+
+  // backlog/ACCEPTED.md — the template stub verbatim; QCode-Method has no accepted-but-unplanned
+  // decisions of its own to carry forward.
+  writes.push({ path: 'backlog/ACCEPTED.md', content: readFileSync(join(TEMPLATES, 'backlog/ACCEPTED.md'), 'utf8') });
+
+  // PROJECT-STATUS.md — href fixes (applied globally, not just inside specific table cells — the
+  // "Last shipped" narrative bullet reuses the exact same href as its Recently-done row, and a
+  // fix scoped only to the Recently-done table missed it entirely on the first pass against this
+  // repo's own real content), then section surgery (drop the now-obsolete v1-shape callout and
+  // "Recently done", add "Needs status review" + the two new index links) — everything else on
+  // the board (the Updated/Phase line, the Last-shipped/Next-up narrative text itself, "How status
+  // works") is the project's own content and is preserved untouched.
+  const { tableRows, cells, extractId } = await import(
+    `file://${join(TEMPLATES, 'scripts/board-check.mjs').replace(/\\/g, '/')}`
+  );
+
+  const hrefFixes = new Map(); // old href string -> new href string, collected from every table we understand
+  for (const row of epicsTableRows) {
+    const m = row.detailHref?.match(/^backlog\/(epic-\d{2}-[a-z0-9-]+)\.md$/);
+    if (m) hrefFixes.set(row.detailHref, `backlog/${m[1]}/README.md`);
+  }
+  for (const row of recentlyDone) {
+    const slug = slugByNum.get((row.id || '').split('.')[0]);
+    if (slug && row.detailHref) hrefFixes.set(row.detailHref, `backlog/${slug}/${row.id}.md`);
+  }
+  for (const row of tableRows(statusMd, '| Story | Status | Link |')) {
+    const c = cells(row);
+    const id = extractId(c[0] || '');
+    const hrefMatch = /\]\(([^)]+)\)/.exec(c[2] || '');
+    const slug = id && slugByNum.get(id.split('.')[0]);
+    if (slug && hrefMatch) hrefFixes.set(hrefMatch[1], `backlog/${slug}/${id}.md`);
+  }
+
+  let newStatus = statusMd;
+  for (const [oldHref, newHref] of hrefFixes) newStatus = newStatus.split(`](${oldHref})`).join(`](${newHref})`);
+
+  newStatus = newStatus.replace(/> \*\*v1 board shape, deliberately\.\*\*[\s\S]*?\n\n(?=\*\*Updated)/, '');
+
+  // Section surgery below uses explicit index splicing rather than regex whitespace lookahead — a
+  // non-greedy `[\s\S]*?` consuming "up to the next heading" doesn't reliably leave exactly one
+  // blank line on either side once something is inserted or removed; splicing on a known heading
+  // string and normalizing each side's own whitespace explicitly does.
+
+  /** Removes a whole `## heading` section (heading + its content) up to the next `## ` heading. */
+  const removeSection = (md, headingLine) => {
+    const at = md.indexOf(headingLine);
+    if (at === -1) return md;
+    const nextAt = md.indexOf('\n## ', at);
+    const before = md.slice(0, at).replace(/\n+$/, '');
+    const after = nextAt === -1 ? '' : md.slice(nextAt).replace(/^\n+/, '');
+    return after ? `${before}\n\n${after}` : before;
+  };
+
+  /** Inserts a new `## `-headed section right after an existing section's own content ends. */
+  const insertSectionAfter = (md, existingHeadingLine, newSection) => {
+    const at = md.indexOf(existingHeadingLine);
+    if (at === -1) return md;
+    const nextAt = md.indexOf('\n## ', at);
+    const head = (nextAt === -1 ? md : md.slice(0, nextAt)).replace(/\n+$/, '');
+    const tail = nextAt === -1 ? '' : md.slice(nextAt).replace(/^\n+/, '');
+    return tail ? `${head}\n\n${newSection}\n\n${tail}` : `${head}\n\n${newSection}`;
+  };
+
+  /** Inserts `content` right after a heading LINE itself, before whatever already follows it. */
+  const insertAfterHeading = (md, headingLine, content) => {
+    const at = md.indexOf(headingLine);
+    if (at === -1) return md;
+    const afterHeading = at + headingLine.length;
+    return md.slice(0, afterHeading) + '\n\n' + content + md.slice(afterHeading);
+  };
+
+  newStatus = removeSection(newStatus, '## Recently done — the increment log');
+
+  // "How status works" is prose, not a parsed table — but its own last bullet describes the exact
+  // mechanism this migration just changed ("moves to Recently done"), which is now false the moment
+  // that section is gone. This is a direct consequence of the shape change, not new content, so
+  // it's in scope the same way the href fixes are — the wording matches the v2 template's own.
+  newStatus = newStatus.replace(
+    /- A story gets its own row under \*\*Active increments\*\* when its subagent pass starts, then moves to\n\s*\*\*Recently done\*\* once its QA pass confirms the acceptance criteria and it's committed\./,
+    '- A story gets its own row under **Active increments** when work starts. It comes **off** this board —\n  never into a "done" section here — the moment `tech-qa` passes it: that same commit appends its row\n  to [`backlog/CLOSED.md`](backlog/CLOSED.md) and flips it to `done`.'
+  );
+
+  if (!newStatus.includes('## Needs status review')) {
+    newStatus = insertSectionAfter(
+      newStatus,
+      '## Active increments',
+      `## Needs status review\n\nStories the board can't confirm — a claimed status with no merged PR behind it. A to-do list, not a\nstatus: resolve each by checking the PR/branch and correcting or removing the row. **None yet.**`
+    );
+  }
+
+  // Guarded on the bullet's own unique label, not a generic "backlog/CLOSED.md" substring — the
+  // "How status works" fix just above also mentions that path by name, which made this guard
+  // false-positive (already-present) on this repo's own first real run and silently dropped both
+  // bullets below. Caught only by reading the actual migrated PROJECT-STATUS.md, not assumed clean.
+  if (!newStatus.includes('**Closed work (shipped stories)**')) {
+    newStatus = insertAfterHeading(
+      newStatus,
+      '## Where the detail lives',
+      `- **Closed work (shipped stories)** → [backlog/CLOSED.md](backlog/CLOSED.md) — append-only index.\n` +
+        `- **Accepted-but-not-yet-planned decisions** → [backlog/ACCEPTED.md](backlog/ACCEPTED.md)`
+    );
+  }
+
+  writes.push({ path: 'PROJECT-STATUS.md', content: newStatus });
+
+  return { epics, epicsTableRows, recentlyDone, slugByNum, warnings, writes, deletes, statusMd, epicFiles };
+}
+
+// A genuinely v1 project predates the v2 OPERATIONAL tooling (board-check.mjs, its fixtures, the CI
+// template, ...) by definition — it may not even have .qcode/config.json (QCode-Method's own repo
+// doesn't; it was hand-bootstrapped by story 01.1, before board-check.mjs existed). Without this,
+// "board:check exits 0 immediately after migrate" — this story's own acceptance criterion — would be
+// untestable: the script that check needs wouldn't exist yet. Runs on EVERY migrate call, including
+// one against an already-migrated backlog — refreshing the operational tooling is itself idempotent
+// and useful on its own (a project that migrated once but never re-ran this after the framework's
+// scripts/cockpit/CI templates changed shouldn't have to re-migrate its whole backlog to catch up).
+//
+// Installs just scripts/ + cockpit/ + githooks/ + ci/ (what board:check, check:links, and the
+// cockpit actually need), deliberately NOT skills/ — installing the full lifecycle-gate skill set is
+// a separate, much bigger decision (whether an existing project adopts product-check/tech-planning/
+// tech-build/tech-qa) that migrate's own acceptance criteria don't ask for, and doing it blindly here
+// broke check:links on this repo's own first real run: those skills reference CLAUDE.md/architecture/
+// product/ paths a real scaffolded consumer project has and QCode-Method's own repo doesn't (it's the
+// framework, not a project built on it). `sync`, run deliberately by a project that HAS chosen to
+// adopt the gates, is where installing skills/ belongs.
+function installOperationalTooling(projectDir) {
+  const OPERATIONAL_PREFIXES = ['scripts/', 'cockpit/', 'githooks/', 'ci/'];
+  const config = loadConfig(projectDir);
+  const tokens = config?.tokens ?? { ...CHARTER_DEFERRED_TOKENS, PROJECT_NAME: basename(projectDir) };
+  const operationalManifest = resolveManifest(TEMPLATES, config ?? {}).filter((e) =>
+    OPERATIONAL_PREFIXES.some((p) => e.templateRelPath.startsWith(p))
+  );
+  const report = renderProject({
+    templatesRoot: TEMPLATES,
+    projectRoot: projectDir,
+    tokens,
+    config: config ?? {},
+    manifest: operationalManifest,
+    write: true,
+  });
+  console.log(
+    `✅ operational tooling installed/refreshed (scripts/cockpit/githooks/ci) — ${report.created.length} created, ` +
+      `${report.updated.length} updated, ${report.upToDate.length} already current.`
+  );
+}
+
+async function migrate(args) {
+  const targetArg = args._[0];
+  if (!targetArg) die('usage: node qcode.mjs migrate <project-dir> [--write]');
+  const projectDir = resolve(targetArg);
+  const write = !!args.write;
+
+  const plan = await migratePlan(projectDir);
+  if (plan.alreadyMigrated) {
+    console.log(`✅ ${projectDir} already has backlog/CLOSED.md — already v2-shaped.`);
+    if (write) installOperationalTooling(projectDir);
+    else console.log('(dry-run — pass --write to still refresh the operational tooling.)');
+    return;
+  }
+
+  console.log(`\nQCode-Method migrate — ${projectDir}`);
+  console.log(write ? '(writing)\n' : '(dry-run — pass --write to apply)\n');
+
+  console.log(`${plan.epics.length} epic file(s) found: ${plan.epicFiles.join(', ')}`);
+  for (const e of plan.epics) {
+    console.log(`  ${e.file} -> backlog/${e.slug}/  (${e.stories.length} stor${e.stories.length === 1 ? 'y' : 'ies'}, ${e.closures.length} closed)`);
+  }
+  console.log(`\n${plan.writes.length} file(s) to write, ${plan.deletes.length} file(s) to delete:`);
+  for (const w of plan.writes) console.log(`  write  ${w.path}`);
+  for (const d of plan.deletes) console.log(`  delete ${d}`);
+
+  if (plan.warnings.length) {
+    console.log(`\n⚠ ${plan.warnings.length} warning(s):`);
+    for (const w of plan.warnings) console.log(`  - ${w}`);
+  }
+
+  if (!write) {
+    console.log(`\nDry run only — pass --write to apply.`);
+    return;
+  }
+
+  for (const w of plan.writes) {
+    const abs = join(projectDir, w.path);
+    mkdirSync(dirname(abs), { recursive: true });
+    writeFileSync(abs, w.content);
+  }
+  for (const d of plan.deletes) {
+    rmSync(join(projectDir, d));
+  }
+
+  console.log(`\n✅ migrated — ${plan.writes.length} file(s) written, ${plan.deletes.length} deleted.`);
+
+  installOperationalTooling(projectDir);
+
+  console.log(`\nRun \`node scripts/board-check.mjs\` (from inside ${projectDir}) to confirm the board is true.`);
+}
+
 // ── CLI dispatch. ────────────────────────────────────────────────────────────────────────────────
 
 const [, , mode, ...rest] = process.argv;
 const args = parseArgs(rest);
 
-if (mode === 'generate') {
-  await generate(args);
+const MODES = { generate, sync, check, migrate };
+if (mode && MODES[mode]) {
+  await MODES[mode](args);
 } else if (!mode) {
-  die('usage: node qcode.mjs <generate> ... (sync/migrate/check ship in 05.4)');
+  die(`usage: node qcode.mjs <${Object.keys(MODES).join('|')}> ...`);
 } else {
-  die(`unknown mode "${mode}" — only "generate" is implemented so far (sync/migrate/check ship in 05.4)`);
+  die(`unknown mode "${mode}" — expected one of: ${Object.keys(MODES).join(', ')}`);
 }
