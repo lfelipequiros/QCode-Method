@@ -90,8 +90,12 @@ the rest. Don't over-ask — offer sensible defaults (shown) and accept them.
    name, one-line outcome, value archetype, and dependency, then render the rows into **both** epic
    tables from the same data: `{{EPIC_TABLE}}` (the board format in `PROJECT-STATUS.md` — `Status /
    Detail` columns) and `{{EPIC_TABLE_ROADMAP}}` (the roadmap format in `backlog/00-roadmap.md` —
-   `Outcome / Value archetype / Depends on` columns). *Default:* Foundation only → both tokens render
-   to empty (the `(to define)` gap below each table covers epics 02+).
+   `Outcome / Value archetype / Depends on` columns). *Default:* Foundation only → **delete both
+   tokens' lines entirely** — do not leave a blank line in their place. Each token sits alone on its
+   own line inside a markdown table; a blank line there ends the table early (`board-check`'s row
+   reader stops at the first line that isn't a table row), which silently hides every row below it
+   — including the ad-hoc bucket's own row — from every rule that reads that table. Substituting
+   "empty" must mean *no line*, not *an empty one*.
 10. **Strategic advisor** — install the optional **`compass-check`** skill (a read-only CTO-conscience
     that sits above the gates and advises on direction)? *(yes/no — default yes.)*
 11. **Git** — initialize the repo + install the status-guard hook now? (yes/no)

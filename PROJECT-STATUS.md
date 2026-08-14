@@ -13,11 +13,13 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 
 **Updated:** 2026-08-13 · **Phase:** Building (epic 02) · **Branch:** `v2-extraction`
 
-- **Last shipped:** [02.1](backlog/epic-02-shape-and-enforcement.md#021--information-architecture-the-adr-059-shape) —
-  the ADR-059 shape landed in the scaffolder templates: open-work-only board, `CLOSED.md` /
-  `ACCEPTED.md`, epic-01-foundation split into per-story files, the ad-hoc bucket restructured.
-- **Next up:** `02.2` — port `board-check.mjs` + its fixture tests, so the shape 02.1 just wrote
-  becomes machine-checked rather than merely documented.
+- **Last shipped:** [02.2](backlog/epic-02-shape-and-enforcement.md#022--port-board-checkmjs--fixture-tests) —
+  `board-check.mjs` ported (7 rules, config-driven, zero deps) with a shared `status-vocab.mjs` and
+  39 `node:test` fixture cases. Found and fixed a real cross-story bug in 02.1's board template
+  along the way (`{{EPIC_TABLE}}` breaking table parsing when empty).
+- **Next up:** `02.3` — the shared `status-guard.sh` predicate, `check-links.mjs`, and
+  `index-backlog.mjs`, so `board-check` gets wired into the pre-commit hook and CI, and rule 5's
+  graceful skip starts actually checking links.
 
 ## Epics
 
@@ -37,12 +39,13 @@ the story in its epic.
 
 | Story | Status | Link |
 |-------|--------|------|
-| 02.2 | `in-progress` | [epic-02 § 02.2](backlog/epic-02-shape-and-enforcement.md#022--port-board-checkmjs--fixture-tests) |
+| 02.3 | `in-progress` | [epic-02 § 02.3](backlog/epic-02-shape-and-enforcement.md#023--rebuild-the-guard-as-a-shared-predicate) |
 
 ## Recently done — the increment log
 
 | Story | Date | Detail |
 |-------|------|--------|
+| 02.2 | 2026-08-13 | [epic-02 § 02.2](backlog/epic-02-shape-and-enforcement.md#022--port-board-checkmjs--fixture-tests) — board-check.mjs, 7 rules, 39 tests |
 | 02.1 | 2026-08-13 | [epic-02 § 02.1](backlog/epic-02-shape-and-enforcement.md#021--information-architecture-the-adr-059-shape) — the ADR-059 shape in the scaffolder templates |
 | 01.1 | 2026-08-13 | [epic-01 § 01.1](backlog/epic-01-secure-base.md#011--commit-token-discipline-v102-branch-bootstrap-the-board) — v1.0.2 + branch + board bootstrap |
 

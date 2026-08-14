@@ -149,3 +149,27 @@ Two judgment calls resolved directly by the orchestrator rather than sent back f
 Also fixed at QA time: `00-roadmap.md`'s Foundation row had no markdown link at all in the
 original (contrary to the file's own stated promise) — the subagent added one rather than
 "repointing" something that never existed, which is the more correct read of the intent.
+
+#### Closed: 02.2 — 2026-08-13
+
+Built by subagent, independently re-verified by the orchestrating session (re-ran
+`node --test scripts/board-check.test.mjs` directly rather than trusting the report: 39/39 pass,
+matches exactly). Reviewed `board-check.mjs` and `status-vocab.mjs` in full — clean, all seven
+rules faithfully ported with real improvements over the source: config-driven budgets with
+no-config-needed defaults, `rule5`'s graceful skip when `check-links.mjs` doesn't exist yet
+(02.3), and `rule2`'s CLOSED-row link check stripping `#anchor`s before the existence test (avoids
+a false violation the source platform's own version doesn't guard against).
+
+**A real cross-story bug was found and fixed.** Self-testing `board-check.mjs` against the
+templates' own `PROJECT-STATUS.md` surfaced a genuine defect in 02.1's work: `{{EPIC_TABLE}}` sits
+alone on its own line inside the Epics table, and substituting it with an empty string (the
+"Foundation only" default — the common case for a fresh scaffold) leaves a blank line, which ends
+the table early and hides every row below it, including the ad-hoc bucket's row, from every rule
+that reads that table. Same defect in `00-roadmap.md`'s `{{EPIC_TABLE_ROADMAP}}`. Resolved two
+ways: `SKILL.md`'s interview step 9 now explicitly instructs deleting the whole line rather than
+leaving it blank (fixes it for today's AI-driven substitution), and epic 05 story 05.1 gained an
+acceptance criterion requiring the real renderer to handle this programmatically once it exists —
+the durable fix, since it removes the dependency on instruction-following entirely. An inline
+HTML-comment safety net was tried and deliberately reverted: it would have needed correct handling
+on both the empty and non-empty substitution paths, adding a second thing to get right rather than
+removing the one that already existed.

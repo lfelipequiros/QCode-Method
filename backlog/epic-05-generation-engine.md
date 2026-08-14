@@ -32,6 +32,13 @@ a bug class where three implementations drift on how a token is substituted.
   exactly as today's `qcode-sync` already does for Finosonido).
 - **Config schema + `configVersion`** in `.qcode/config.json`, so `migrate` (05.4) can reason about
   which shape a given project was generated from.
+- **The substitution pass deletes a whole line when its only content resolves to empty**, rather
+  than leaving a blank line — found live at 02.2 QA: `{{EPIC_TABLE}}` and
+  `{{EPIC_TABLE_ROADMAP}}` each sit alone on their own line inside a markdown table, and a naive
+  find-replace leaves a blank line there once substituted, which silently ends the table early
+  (`board-check`'s row reader stops at the first non-`|` line — hiding every row below, including
+  the ad-hoc bucket's own row, from every rule that reads that table). Until this story ships,
+  `SKILL.md`'s interview step 9 carries the equivalent instruction for whoever substitutes by hand.
 - **`package.json` merge strategy** — since it's project-owned but v2 needs `board:check` /
   `check:links` / `cockpit` script entries in it, the renderer adds missing script keys without
   ever overwriting a project's existing ones.
@@ -44,6 +51,9 @@ a bug class where three implementations drift on how a token is substituted.
 - A round-trip test (render → render again, same config) produces zero diff.
 - The `package.json` merge adds new keys and touches nothing else on a file that already has
   content.
+- A token that resolves to empty and sits alone on its own line (`{{EPIC_TABLE}}`,
+  `{{EPIC_TABLE_ROADMAP}}`) is removed as a whole line, not replaced with a blank one — proven by
+  rendering a Foundation-only project and running `board:check` against the result.
 
 ### 05.2 — `generate` mode — the scaffold
 
