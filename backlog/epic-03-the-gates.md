@@ -167,6 +167,8 @@ described full v1 close *behavior*, not a stray word, so a shallow prose patch a
 would have half-implemented what this story does properly. Confirmed by grep: zero remaining
 occurrences of "Recently done" in the rewritten file.
 
+### 03.4 — `compass-check` + `record-learnings` reconciliation
+
 **What & why.** `compass-check` needs to read the new closed/accepted indexes and add
 `board:check` as the mechanized half of its own reconcile step; `record-learnings` needs its
 memory routing corrected to repo-only surfaces, and both need their write boundaries stated

@@ -41,7 +41,8 @@ tech-planning                — architecture alignment, target/increment/path, 
 tech-build → tech-qa
 ```
 
-**vs. [`compass-check`](../compass-check/SKILL.md)** *(if installed — it's optional; see
+**vs. `compass-check`** *(if installed — it's optional, so this isn't a real link: the file may
+legitimately not exist in a given project; see
 "Prioritization" below for the fallback when it isn't)*. `compass-check` is read-only and advisory —
 it tells the user *what* to work on next across the whole backlog. This skill is the one that
 actually *writes* a new requirement into the backlog once it's been shaped. Pull `compass-check` in

@@ -2,26 +2,51 @@
 // Markdown link checker — every relative link in the repo's TRACKED docs resolves,
 // file and anchor.
 //
-// SCOPE: TRACKED FILES ONLY. Walking the filesystem instead would make the answer
-// depend on whatever happens to be sitting in the working tree — a scratch file, a
-// vendor doc that's gitignored. That's fatal for a gate: CI checks out only tracked
-// content, so a filesystem-walking checker and this same script run in CI could
-// silently check different file sets, defeating the one-predicate guarantee
-// `status-guard.sh` depends on. `git ls-files` makes the check deterministic instead.
+// SCOPE: TRACKED FILES ONLY, once there's a repo to track them. Walking the filesystem
+// instead would make the answer depend on whatever happens to be sitting in the working
+// tree — a scratch file, a vendor doc that's gitignored. That's fatal for a gate: CI
+// checks out only tracked content, so a filesystem-walking checker and this same script
+// run in CI could silently check different file sets, defeating the one-predicate
+// guarantee `status-guard.sh` depends on. `git ls-files` makes the check deterministic.
+//
+// BEFORE the first commit, there IS no tracked/untracked distinction to protect — `git
+// ls-files` errors outright ("not a git repository"), which would make a freshly
+// rendered scaffold's very first `board:check` fail on a cryptic git error rather than
+// a real finding. So: fall back to a full walk only in that one bootstrap window: no
+// `.git` directory present at all. The moment a repo exists, tracked-only is the rule
+// again, unconditionally — this fallback is not a general "no git available" escape
+// hatch, it's specifically the pre-first-commit case a fresh `generate` produces.
 //
 // Exits non-zero on any dead link, so it's usable as a gate directly. Zero dependencies.
 //
 //   node scripts/check-links.mjs
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { dirname, resolve, join, posix } from 'node:path';
+import { dirname, resolve, join, relative, posix } from 'node:path';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-/** Every tracked `.md` file, repo-relative, POSIX-separated. */
+const WALK_EXCLUDES = new Set(['.git', 'node_modules']);
+
+/** Every `.md` file under `root`, walked directly — the pre-git-init fallback only. */
+function walkMarkdownFiles(root) {
+  const out = [];
+  (function walk(dir) {
+    for (const entry of readdirSync(dir)) {
+      if (WALK_EXCLUDES.has(entry)) continue;
+      const abs = join(dir, entry);
+      if (statSync(abs).isDirectory()) walk(abs);
+      else if (entry.endsWith('.md')) out.push(relative(root, abs).replace(/\\/g, '/'));
+    }
+  })(root);
+  return out;
+}
+
+/** Every tracked `.md` file, repo-relative, POSIX-separated (walks instead, pre-first-commit). */
 export function trackedMarkdownFiles(root = ROOT) {
+  if (!existsSync(join(root, '.git'))) return walkMarkdownFiles(root);
   const out = execFileSync('git', ['ls-files', '--', '*.md'], { cwd: root, encoding: 'utf8' });
   return out.split('\n').filter(Boolean);
 }
@@ -89,7 +114,22 @@ export function checkLinks(root = ROOT, files = trackedMarkdownFiles(root)) {
     const md = readFileSync(absFile, 'utf8');
     const lines = md.split('\n');
 
-    lines.forEach((lineText, i) => {
+    let inFence = false;
+    lines.forEach((rawLine, i) => {
+      // Skip content inside ``` fences entirely — a fenced example (e.g. a template block showing
+      // what a GENERATED file should contain) describes a different file's eventual content, not a
+      // real link from THIS file's own location, and checking it here produces a false positive.
+      if (/^\s*```/.test(rawLine)) {
+        inFence = !inFence;
+        return;
+      }
+      if (inFence) return;
+
+      // Strip inline `single-backtick spans` before matching — the same reasoning as the fence
+      // skip, one level down: `[<id>](<id>.md)` shown as an illustrative inline example (e.g. "add
+      // a row shaped like `| [<id>](<id>.md) | title |`") is documentation text, not a real link.
+      const lineText = rawLine.replace(/`[^`]*`/g, '');
+
       LINK_RE.lastIndex = 0;
       let m;
       while ((m = LINK_RE.exec(lineText))) {

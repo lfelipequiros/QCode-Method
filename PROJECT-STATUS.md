@@ -13,14 +13,14 @@ epics and sixteen stories, built on the `v2-extraction` branch.
 
 **Updated:** 2026-08-14 · **Phase:** Building (epic 05) · **Branch:** `v2-extraction`
 
-- **Last shipped:** [04.1](backlog/epic-04-product-layer.md#041--generalize-product-check--its-trackers) —
-  `product-check` generalized (310 lines, zero Mompa-specific terms), `product/decisions.md` (PDR
-  log) and `product/screens-map.md` (surface map) shipped, the lifecycle diagram now reads "four
-  gates, product-check first" everywhere it's stated. **This closes epic 04** — the whole product
-  layer is now real, not a forward reference.
-- **Next up:** `05.1` — the unified renderer core (`qcode.mjs`): the shared template resolver, token
-  substitution pass, diff engine, and `customized[]` protection that `generate`/`sync`/`migrate` will
-  all import rather than reimplement.
+- **Last shipped:** [05.1](backlog/epic-05-generation-engine.md#051--the-unified-renderer-core) —
+  `lib/qcode-core.mjs`: the shared resolver, token substitution (including the whole-line-empty-token
+  fix), diff/backup, `customized[]` protection, and package.json merge, all exported for 05.2–05.4 to
+  import. Its own end-to-end test found and fixed four real bugs: `check-links.mjs` crashing on a
+  pre-first-commit project, two illustrative-example false positives, an unconditional link to
+  optional `compass-check`, and a genuinely missing story heading in this very backlog.
+- **Next up:** `05.2` — `generate` mode: the CLI that asks only for static identity, renders the
+  whole tree via `lib/qcode-core.mjs`, and self-tests before reporting success (the C7 fix).
 
 ## Epics
 
@@ -40,12 +40,13 @@ the story in its epic.
 
 | Story | Status | Link |
 |-------|--------|------|
-| 05.1 | `in-progress` | [epic-05 § 05.1](backlog/epic-05-generation-engine.md#051--the-unified-renderer-core) |
+| 05.2 | `in-progress` | [epic-05 § 05.2](backlog/epic-05-generation-engine.md#052--generate-mode--the-scaffold) |
 
 ## Recently done — the increment log
 
 | Story | Date | Detail |
 |-------|------|--------|
+| 05.1 | 2026-08-14 | [epic-05 § 05.1](backlog/epic-05-generation-engine.md#051--the-unified-renderer-core) — lib/qcode-core.mjs, 35 tests, 4 real bugs found and fixed |
 | 04.1 | 2026-08-14 | [epic-04 § 04.1](backlog/epic-04-product-layer.md#041--generalize-product-check--its-trackers) — product-check generalized, PDR log + surface map shipped |
 | 03.4 | 2026-08-14 | [epic-03 § 03.4](backlog/epic-03-the-gates.md#034--compass-check--record-learnings-reconciliation) — ACCEPTED.md + board:check in the reconcile, repo-only memory, C9 write boundaries |
 | 03.3 | 2026-08-14 | [epic-03 § 03.3](backlog/epic-03-the-gates.md#033--tech-qa-rewrite) — QA rounds, three-place close, merge authority |
