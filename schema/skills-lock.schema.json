@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QCode-Method skills-lock",
+  "description": "Declares vendor skills a project has chosen to install beyond the framework's own bundled ones — recommended, not required, prerequisites. compass-check's leverage lens reads this to flag drift between what's declared and what's actually present under .claude/skills/; tech-planning's ADR bridge reads it to know whether the architecture skill's full rigor is available. Not validated by a library at runtime (zero dependencies) — this file is the documented contract. To compute a hash: `node -e \"console.log(require('crypto').createHash('sha256').update(require('fs').readFileSync(process.argv[1])).digest('hex'))\" .claude/skills/<name>/SKILL.md`.",
+  "type": "object",
+  "required": ["lockVersion", "skills"],
+  "properties": {
+    "lockVersion": {
+      "type": "integer",
+      "description": "The shape of this file itself. Current value: 1."
+    },
+    "skills": {
+      "type": "object",
+      "description": "Keyed by skill name (matches its directory under .claude/skills/).",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["required", "path"],
+        "properties": {
+          "required": {
+            "type": "boolean",
+            "description": "False for every skill this framework ships as an optional recommendation (e.g. architecture) — a missing required:true entry is a real gap; a missing required:false one just means the team hasn't installed the optional skill yet."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why this skill is worth having — what it unlocks, what falls back to a lesser path without it."
+          },
+          "path": {
+            "type": "string",
+            "description": "Where the skill's SKILL.md lives (or would live), relative to the project root."
+          },
+          "source": {
+            "type": "string",
+            "description": "Where the team gets this skill from — a shared skill repo, a specific vendor, a URL. A `(to define)` gap until foundation settles it."
+          },
+          "hash": {
+            "type": ["string", "null"],
+            "description": "Hex-encoded digest of the installed SKILL.md's exact bytes, recorded the moment it's installed. Null means not yet installed. compass-check re-hashes the live file and compares — a mismatch means the vendor skill drifted upstream since it was last recorded here."
+          },
+          "hashAlgorithm": {
+            "type": "string",
+            "description": "Which digest algorithm hash was computed with. sha256 unless a project has a reason to differ."
+          },
+          "installedAt": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "ISO date the hash was last recorded. Null until installed."
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,34 +1,41 @@
 # Filling the gaps
 
-How the two kinds of blanks in the templates get resolved — at interview time and at foundation time.
-Read this before generating, and hand the **gap checklist** (bottom) to the new project's team.
+How the two kinds of blanks in the templates get resolved — some at `generate` time (the five
+static-identity facts), some at `qcode-charter` time (judgment), some later still, during Epic 01
+(Foundation). Read this before generating, and hand the **gap checklist** (bottom) to the new
+project's team.
 
 ## Two kinds of blank
 
-### 1. `{{TOKEN}}` — resolved now, from the interview
+### 1. `{{TOKEN}}` — resolved at `generate` or `qcode-charter` time
 
-Substitute every occurrence at generation time. Full list:
+Every occurrence gets substituted before either tool finishes. `generate` answers the static-identity
+rows below directly; everything else it either defaults sensibly or leaves as a `(to define: ...)`
+gap for `qcode-charter` to resolve on the project's first real interview. Full list:
 
-| Token | Meaning | Default if user has none |
-|---|---|---|
-| `{{PROJECT_NAME}}` | Display name | — (required) |
-| `{{PROJECT_SLUG}}` | kebab-case id (package names, ids) | derived from name |
-| `{{ONE_LINER}}` | One-sentence "what it is" | — (required) |
-| `{{DOMAIN_SUMMARY}}` | A short paragraph: what it does, for whom | — (required) |
-| `{{TEAM_CONTEXT}}` | Who builds it / consumes it | "solo developer" |
-| `{{OWNER_NAME}}` | Who holds the wheel (used by compass-check) | "the owner" |
-| `{{TODAY}}` | ISO date at generation time | — (runner-supplied) |
-| `{{FRAMEWORK_VERSION}}` | QCode-Method version stamped into `.qcode/config.json` | read from the skill's `VERSION` file |
-| `{{VALUE_ARCHETYPES}}` | 1–3 ways it creates value (generalized ROI) | "replace/avoid a cost · prevent a loss · enable downstream value" |
-| `{{DECISION_AXES}}` | The axes every tool/stack choice is judged on | "Confidence · Time-to-market · Reliability · ROI" |
-| `{{STACK_HOSTING}}` / `{{STACK_FRONTEND}}` / `{{STACK_BACKEND}}` / `{{STACK_DATA}}` / `{{STACK_AI}}` | Stack pieces | "(none)" where N/A |
-| `{{TENANCY}}` | Tenant key name, or single-tenant | "single-tenant" |
-| `{{TYPED_RESULT_NAME}}` | Service-boundary result type | `Result<T>` |
-| `{{ACCESS_LAYER}}` | Typed data-access package name | `@{{PROJECT_SLUG}}/data` or "n/a" |
-| `{{HOUSE_STANDARDS}}` | The engineering non-negotiables | the default list in SKILL.md Step 1.6 |
-| `{{ARCHITECTURE_OVERVIEW}}` | The layers + seams, if known | else becomes a `(to define)` gap |
-| `{{EPIC_TABLE}}` | Extra **board** rows for `PROJECT-STATUS.md` (columns: `# / Epic / Status / Detail`), one per epic beyond Foundation | empty (Foundation only) |
-| `{{EPIC_TABLE_ROADMAP}}` | Extra **roadmap** rows for `backlog/00-roadmap.md` (columns: `# / Epic / Outcome / Value archetype / Depends on`), one per epic beyond Foundation — same epics as `{{EPIC_TABLE}}`, different columns | empty (Foundation only) |
+| Token | Meaning | Resolved by | Default if unanswered |
+|---|---|---|---|
+| `{{PROJECT_NAME}}` | Display name | `generate` (required) | — |
+| `{{PROJECT_SLUG}}` | kebab-case id (package names, ids) | `generate` | derived from name |
+| `{{ONE_LINER}}` | One-sentence "what it is" | `qcode-charter` | `(to define)` gap |
+| `{{DOMAIN_SUMMARY}}` | A short paragraph: what it does, for whom | `qcode-charter` | `(to define)` gap |
+| `{{TEAM_CONTEXT}}` | Who builds it / consumes it | `generate` (confirmed by `qcode-charter`) | "solo developer" |
+| `{{OWNER_NAME}}` | Who holds the wheel (used by compass-check) | `generate` | "the owner" |
+| `{{REPO_HOST}}` | Where the repo is hosted, shown in the project's own `README.md` | `generate` — derived from `--remote`, never a separate question | `(to define)` gap if no `--remote` was given |
+| `{{CLAUDE_PLAN}}` | Which Claude plan runs the project (feeds `CLAUDE.md` §7's token-discipline defaults) | `generate` (confirmed by `qcode-charter`) | "Pro" |
+| `{{PRODUCT_CONSUMERS}}` | Who reads/acts on the project's product surfaces (used by product-check) | `qcode-charter` | "n/a" if there's no user-facing product surface |
+| `{{TODAY}}` | ISO date at generation time | `generate` | — (runner-supplied) |
+| `{{FRAMEWORK_VERSION}}` | QCode-Method version stamped into `.qcode/config.json` | `generate` | read from the framework clone's own `VERSION` file |
+| `{{VALUE_ARCHETYPES}}` | 1–3 ways it creates value (generalized ROI) | `qcode-charter` | `(to define)` gap |
+| `{{DECISION_AXES}}` | The axes every tool/stack choice is judged on | `generate` (confirmed by `qcode-charter`) | "Confidence · Time-to-market · Reliability · ROI" |
+| `{{STACK_HOSTING}}` / `{{STACK_FRONTEND}}` / `{{STACK_BACKEND}}` / `{{STACK_DATA}}` / `{{STACK_AI}}` | Stack pieces | `qcode-charter` | `(to define)` gap per piece |
+| `{{TENANCY}}` | Tenant key name, or single-tenant | `generate` (confirmed by `qcode-charter`) | "single-tenant" |
+| `{{TYPED_RESULT_NAME}}` | Service-boundary result type | `generate` (confirmed by `qcode-charter`) | `Result<T>` |
+| `{{ACCESS_LAYER}}` | Typed data-access package name | `qcode-charter` | `(to define)` gap |
+| `{{HOUSE_STANDARDS}}` | The engineering non-negotiables | `qcode-charter` | `(to define)` gap; the skill offers a default list to accept as-is |
+| `{{ARCHITECTURE_OVERVIEW}}` | The layers + seams, if known | `qcode-charter` | `(to define)` gap |
+| `{{EPIC_TABLE}}` | Extra **board** rows for `PROJECT-STATUS.md` (columns: `# / Epic / Status / Detail`), one per epic beyond Foundation | `generate` renders empty; `qcode-charter` adds rows via direct edit, not a token (the token line is already gone once `generate` has run) | empty (Foundation only) |
+| `{{EPIC_TABLE_ROADMAP}}` | Extra **roadmap** rows for `backlog/00-roadmap.md`, same epics as `{{EPIC_TABLE}}`, different columns (`Outcome / Value archetype / Depends on`) | same as `{{EPIC_TABLE}}` | empty (Foundation only) |
 
 ### 2. `(to define: <what> — <how/when>)` — resolved later, during foundation
 
@@ -60,16 +67,27 @@ Hand this to the team. Each item is a `(to define)` gap that ships in the genera
 - **Cockpit view** — the cockpit renders an epic-based progress view out of the box. If the project
   wants the *architecture-layer* view instead, fill the `(to define)` `LAYERS` config at the top of
   `cockpit/generate.mjs` (map each layer to the epics that build it).
-- **CI status guard** — the generated `.githooks/pre-commit` is the *local* guard; add an
-  un-bypassable server-side equivalent in CI as an Epic 01 story (it can't be enforced by a template).
+- **CI status guard** — the generated `.githooks/pre-commit` is the *local* guard; the CI twin now
+  ships as a template too (`ci/board-guard.yml` → `.github/workflows/board-guard.yml`), invoking the
+  identical `githooks/status-guard.sh` predicate so local and server-side enforcement can't drift
+  apart. What's left for Epic 01 isn't writing it — it's wiring it into the project's actual GitHub
+  repo (turn the check on as a required status check under branch protection, once there's a remote).
 - **`record-learnings` routing table** — the generated skill ships with the scaffold-default
-  destinations (ADR, ASD, TECH-DEBT, OPEN-QUESTIONS, CLAUDE.md, backlog, memory, handoff). Its table
-  carries one `(to define)` row: add a routing row for each canonical doc this project keeps *beyond*
-  the defaults (e.g. a cost/expenses log, a standing strategic-posture file, an integration-research or
+  destinations (ADR, ASD, TECH-DEBT, OPEN-QUESTIONS, CLAUDE.md, backlog, product, handoffs — every
+  row a committed, repo-owned surface; none an external memory store). Its table carries one
+  `(to define)` row: add a routing row for each canonical doc this project keeps *beyond* the
+  defaults (e.g. a cost/expenses log, a standing strategic-posture file, an integration-research or
   environments runbook), mapping each kind of learning to that file during foundation.
-- **compass-check `business-context.md`** (only if the optional advisor was installed) — fill its
-  standing-posture fields (bandwidth, runway, deadlines, risk appetite, known failure modes) during
-  foundation, or leave them: compass-check asks when a missing fact would change a recommendation.
+- **Epic numbering beyond eight named epics** — `08` is permanently reserved for the ad-hoc bucket
+  (`backlog/08-adhoc/`) in both `PROJECT-STATUS.md`'s Epics table and `00-roadmap.md`'s Epic map. A
+  project that ends up with more than eight *named* epics numbers around it (`07`, then `09`, `10`,
+  …) rather than renumbering the bucket or colliding with it — the bucket's own id never moves.
+- **compass-check `business-context.md`** (only if the optional advisor was installed) — filled by
+  `qcode-charter` in its own first pass; after that, `compass-check` maintains it, asking again only
+  when a missing or stale fact would change a recommendation.
+
+Most of these are exactly what `qcode-charter`'s own interview walks — this checklist is the
+reference copy; that skill is where the answers actually get applied.
 
 ## A note on the gates
 
@@ -77,7 +95,13 @@ Hand this to the team. Each item is a `(to define)` gap that ships in the genera
 *structure* (plan→build→qa, target/increment/path, the divergence protocol, the two-phase QA) is
 universal and ships intact. Their *invariants* (the seam checks, the tenant key + access policies, the
 typed result wrapper + boundary validation) are parameterized by `{{HOUSE_STANDARDS}}` /
-`{{ACCESS_LAYER}}` / `{{TENANCY}}` tokens plus `(to define)` gaps for the architecture-specific checks.
-After foundation resolves those gaps, revisit the three gate skills once and replace any remaining
-`(to define)` in their alignment checklists with the project's now-real invariants — a five-minute pass
-that makes the gates bite.
+`{{ACCESS_LAYER}}` / `{{TENANCY}}` tokens plus `(to define)` gaps for the architecture-specific checks
+— the seam-invariant gap specifically is identical across all three files, and `qcode-charter` resolves
+it in all three in the same pass (see that skill's "Resolve the seam gap" section) rather than leaving
+them to drift out of sync.
+
+`product-check`, the fourth gate, is different: it's already fully generic (its interview, edge-case
+checklist, and gatekeeping posture don't depend on the stack or architecture at all) except for
+`{{PRODUCT_CONSUMERS}}`. If that resolved to "n/a" at interview time, the skill still ships — it just
+routes every idea straight to `tech-planning` per its own "when this applies" section, rather than
+running dead ceremony on a project with no user-facing product surface.

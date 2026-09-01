@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QCode-Method project config",
+  "description": "Written by `qcode generate` at scaffold time; read by sync/migrate/check to know what a project was generated from and how to render it again. Not validated against this schema by a library at runtime (zero dependencies) — lib/qcode-core.mjs's validateConfigShape() checks the subset that matters for the rest of that module to work correctly; this file is the full documented contract.",
+  "type": "object",
+  "required": ["configVersion", "frameworkVersion", "scaffoldedAt", "tokens"],
+  "properties": {
+    "configVersion": {
+      "type": "integer",
+      "description": "The SHAPE of this config file itself (this field's own meaning, the customized/statusGuard/boardCheck keys) — distinct from frameworkVersion, which is which QCode-Method release generated or last synced the project. migrate reads this to know how to upgrade an older config shape. Current value: 1."
+    },
+    "frameworkVersion": {
+      "type": "string",
+      "description": "QCode-Method VERSION at generation time, or the version last synced to."
+    },
+    "scaffoldedAt": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO date the project was generated."
+    },
+    "syncedAt": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO date of the last successful `sync --write` run. Absent until the first sync."
+    },
+    "compassCheck": {
+      "type": "boolean",
+      "description": "Whether the optional compass-check skill was installed at generation time."
+    },
+    "customized": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Substrings of target-relative paths the project has intentionally enriched beyond the generic template (e.g. \"tech-planning\" to protect a hand-enriched tech-planning/SKILL.md). sync/migrate show these as review-only diffs and never overwrite them without --force — this is how a donor project richer than the generic templates adopts framework updates without losing its enrichments."
+    },
+    "boardCheck": {
+      "type": "object",
+      "description": "Optional overrides for board-check.mjs's defaults. Absent or partial falls back to the built-in defaults per-key — see that file's own loadBoardCheckConfig().",
+      "properties": {
+        "storyIdPattern": { "type": "string" },
+        "fileBudgets": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "maxStatusCell": { "type": "integer", "minimum": 1 },
+        "maxIndexRow": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "statusGuard": {
+      "type": "object",
+      "description": "Optional overrides for status-guard.sh's rule 7 (the status-event code-file detector).",
+      "properties": {
+        "codeExtensions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Extensions (no leading dot) that count as \"source code changed\" for rule 7. Defaults to ts/tsx/js/jsx/mjs/sql/py/go/rs if absent."
+        }
+      },
+      "additionalProperties": false
+    },
+    "tokens": {
+      "type": "object",
+      "description": "Every {{TOKEN}} value substituted at generation time, keyed by token name without the surrounding braces (e.g. \"PROJECT_NAME\", not \"{{PROJECT_NAME}}\"). See references/filling-the-gaps.md for the full token list.",
+      "additionalProperties": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

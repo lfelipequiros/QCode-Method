@@ -32,7 +32,10 @@ It is the navigator, not the engine.
 ## Prime directives
 
 - **Advisory and read-only.** Never write code, plans, migrations, or status. Never edit the
-  backlog or PROJECT-STATUS. The gates mutate; `compass-check` only reads, reasons, and routes.
+  backlog or PROJECT-STATUS. The gates mutate; `compass-check` only reads, reasons, and routes. This
+  includes never filing a `raised` story itself, even when a gap this skill surfaces clearly deserves
+  one — **that's `product-check`'s job** (if the project runs it) or `tech-planning`'s directly.
+  Recommend it; don't create it.
 - **Anti-busywork.** A real CTO's most valuable word is sometimes "nothing — you're on track." Be
   genuinely willing to return **"good to go"** or **"stop, you're over-building."** Manufacturing
   work to look useful is the failure mode this skill exists to prevent, not commit.
@@ -41,6 +44,19 @@ It is the navigator, not the engine.
 - **Don't reinvent — orchestrate.** Most specialist knowledge already lives in other skills. Your
   job is to know *when to pull them in* and *flag when the work is drifting from them*, not to
   duplicate them. See "Defer, don't duplicate."
+
+## Two depths — default to lite
+
+- **Lite check (default, most invocations):** read `business-context.md`, PROJECT-STATUS's *Next*
+  + *Active increments* sections, and scan TECH-DEBT.md **only for `open` items whose trigger
+  plausibly fired** since the board's *Updated* date. Answer the "what now?" question from that.
+  Skip the full backlog/ASD/handoff/git sweep below.
+- **Full sweep (on demand or on cadence):** the complete Step 1 load. Run it only when
+  (a) {{OWNER_NAME}} explicitly asks for a health-check / full review, (b) an **epic** is starting or
+  closing, or (c) the lite check surfaced a contradiction it can't resolve.
+- **Cadence:** compass-check is an epic-boundary and "lost the thread" tool — not a per-story
+  ritual. Between stories inside an approved epic, the sequenced backlog already answers "what
+  next"; don't re-derive it.
 
 ## Boundaries (so this stays the conscience, not an everything-skill)
 
@@ -69,9 +85,13 @@ instead of a generic assistant.
 
 Read the live state, then reconcile it against the repo so you never advise off a stale board:
 
-- [PROJECT-STATUS.md](../../../PROJECT-STATUS.md) — phase, active, next, the epic table, recently done.
+- [PROJECT-STATUS.md](../../../PROJECT-STATUS.md) — phase, active, next, the epic table. What's
+  **shipped** is no longer here — read [backlog/CLOSED.md](../../../backlog/CLOSED.md) for that.
+- [backlog/ACCEPTED.md](../../../backlog/ACCEPTED.md) — decided, not yet planned. Directly relevant
+  here: an entry sitting in it is a call already made and never routed into `tech-planning`, which is
+  often the highest-leverage "next move" hiding in plain sight.
 - [backlog/](../../../backlog/) — the sequenced plan, the dependency chain, and the
-  [08-adhoc](../../../backlog/08-adhoc.md) parking-lot of candidate work.
+  [08-adhoc](../../../backlog/08-adhoc/README.md) parking-lot of candidate work.
 - [OPEN-QUESTIONS.md](../../../OPEN-QUESTIONS.md) — external blockers only {{OWNER_NAME}} can clear.
 - [TECH-DEBT.md](../../../TECH-DEBT.md) — shortcuts and their paydown triggers. **Don't just read it —
   walk it item by item.** For every `open` entry, evaluate its **paydown trigger against the current
@@ -85,6 +105,12 @@ Read the live state, then reconcile it against the repo so you never advise off 
 - The most recent file in [handoffs/](../../../handoffs/) — what just happened.
 - `git log` since the board's *Updated* date + working tree — to catch drift the board hasn't caught
   up to (a tooling commit, a `--no-verify`, anything the SDLC guard let pass).
+- **`board:check`** (read-only, seconds) — the mechanized half of this reconcile. It proves the board
+  is *true*, not merely written: no id open and closed at once, every id resolves to a story file,
+  every status in vocabulary, every link alive, every index still an index. It's the same predicate
+  the pre-commit hook and CI run, so a **clean** result means the drift you're hunting is semantic (a
+  status that's stale but well-formed) rather than structural — telling you where to spend the rest of
+  Step 1.
 
 ## The CTO scorecard — drivers vs. guardrails
 
@@ -155,7 +181,10 @@ the state demands. Lenses can return "nothing here" — most will, most days.
    job is to notice when usage has drifted from best practice and say so.
 5. **Leverage / tooling** — what would lower {{OWNER_NAME}}'s effort or raise results: a skill worth
    installing given the stack ({{STACK_FRONTEND}} / {{STACK_BACKEND}} / {{STACK_DATA}} / {{STACK_AI}}
-   — audit against `.claude/skills/`), an automation, a hook, or **the next *tool* to build**.
+   — audit against [`skills-lock.json`](../../../skills-lock.json) if the project tracks one, and
+   `.claude/skills/`), an automation, a hook, or **the next *tool* to build**. A skill present in
+   `.claude/skills/` but absent from the lockfile (or vice versa) is itself a finding — installed
+   skills can drift from what the project believes it has.
 6. **Human guardrails** — read the *known failure modes* in `business-context.md`. Is {{OWNER_NAME}}
    about to repeat one (over-building, skipping baseline capture, leaking a secret, letting docs
    drift, scope creep in a session)? If so, name it kindly and propose a **guardrail that prevents it
@@ -206,6 +235,7 @@ Keep it terse by default; expand a lens only when it has something real to say.
 
 | When the work is about… | Pull in / point to |
 |---|---|
+| A new product idea, not yet backlog-shaped | `product-check` (if the project installs it — files the `raised` story; this skill never does) |
 | Planning a chosen increment | `tech-planning` → `tech-build` → `tech-qa` |
 | Architecture decisions / ADRs | [architecture/](../../../architecture/) (+ an `architecture` skill if installed) |
 | Line-level bugs / security on a diff | `tech-qa` / `code-review` / `security-review` |

@@ -1,0 +1,11 @@
+#!/bin/sh
+# QCode - Method SDLC guard (local) — keep the status board honest.
+#
+# Thin wrapper: the rule lives in the shared predicate `status-guard.sh`, which the
+# CI guard also invokes, so local and server-side enforcement can never drift.
+#
+# `--diff-filter=ACMRD` (not just `ACMR`): the predicate distinguishes a story file
+# being ADDED or DELETED — both real status events — from one merely being edited,
+# which carries no status impact at all. `D` has to be in the filter for that.
+
+git diff --cached --name-status --diff-filter=ACMRD | sh "$(dirname "$0")/status-guard.sh"

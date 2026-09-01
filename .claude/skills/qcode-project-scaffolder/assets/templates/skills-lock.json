@@ -1,0 +1,14 @@
+{
+  "lockVersion": 1,
+  "skills": {
+    "architecture": {
+      "required": false,
+      "reason": "Gives tech-planning's ADR bridge full rigor (named options, a trade-off analysis against the decision axes, consequences) instead of its own inline fallback. compass-check's leverage lens reads this entry to flag drift between what's installed and what's recorded here.",
+      "path": ".claude/skills/architecture/SKILL.md",
+      "source": "(to define: where this project gets the architecture skill from, during foundation.)",
+      "hash": null,
+      "hashAlgorithm": "sha256",
+      "installedAt": null
+    }
+  }
+}

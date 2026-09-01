@@ -8,7 +8,9 @@ description: >-
   end-of-story sweep, update the docs from this session." It reviews the session (cross-checked against
   git) and, for each durable thing learned, decides its home: a decision → ADR, a shortcut →
   TECH-DEBT, an external unknown → OPEN-QUESTIONS, a business/domain fact → CLAUDE.md, an architecture
-  change → the ASD, a cross-session fact → memory. It LINKS, never duplicates, and proposes edits for
+  change → the ASD, a product/UX fact → product-check's surfaces (proposed, not written directly). No
+  external memory store — every durable fact lands on a committed, versioned surface. It LINKS, never
+  duplicates, and proposes edits for
   approval before applying. It does NOT write the session narrative (that's `handoff`, a separate
   on-demand tool, not an every-story step) and does NOT change PROJECT-STATUS status values (gate-owned
   — it only flags drift). It captures knowledge, it doesn't plan or code.
@@ -28,11 +30,19 @@ decides *what belongs where* and writes it there, **linking** between files rath
 copied fact is the drift bug the whole system designs against). If the destination already covers a
 learning, that's a no-op — say so and move on.
 
-**Where it sits in the lifecycle:** it is the **final step of the routine delivery flow** — `build →
-push + PR → review → tech-qa → merge → record-learnings`. `handoff` is **not** part of that routine:
-it's a separate, on-demand tool for specific topics (see "Not `handoff`" below), not an every-story
-step. *If* you do also write a handoff for the session, run this sweep first so the handoff can link to
-the ADR/debt rows it created (see [`CLAUDE.md`](../../../CLAUDE.md) §7).
+**Where it sits in the lifecycle:** it is the **final link in the canonical wrap-up sequence**, stated
+once at [`CLAUDE.md`](../../../CLAUDE.md) §7.3. `handoff` is **not** part of that chain: it's a
+separate, on-demand tool for specific topics (see "Not `handoff`" below), not an every-story step.
+*If* you do also write a handoff for the session, run this sweep first so the handoff can link to the
+ADR/debt rows it created.
+
+**Run it cheap.** This sweep is designed to work from *evidence* (git log, the diff, the live
+docs), not from the chat transcript — so its natural home is a **fresh session** (or right after
+`/clear`), pointed at `git log <last-sweep>..HEAD`. Don't run it at the tail of a long build
+session where every turn re-reads the whole transcript. Cadence: sweep **per epic** (or when a
+hard-won lesson / new ADR / new debt obviously appeared) rather than mechanically per story — a
+story whose gates already filed everything is the designed no-op, and batching three no-op sweeps
+into one costs a third as much.
 
 ## What this skill is NOT
 
@@ -78,8 +88,9 @@ knowledge itself.
 | An **unknown that only someone outside the repo can resolve** | [`OPEN-QUESTIONS.md`](../../../OPEN-QUESTIONS.md) | a Q-row (question · blocks · who) — or move one to **Resolved** if an answer arrived |
 | A durable **business / domain** fact, or an operating rule | [`CLAUDE.md`](../../../CLAUDE.md) | a precise edit — **always confirm with the user first** |
 | A **scope / roadmap** change | [`backlog/`](../../../backlog/) | an epic/story edit (acceptance criteria, sequencing) |
-| A **cross-session fact** worth carrying to the next chat (who the user is, feedback, a project constraint, a reference) | the auto-memory store (if the harness has one) | a memory file per the memory rules |
+| A **cross-session fact** worth carrying to the next chat (who the user is, feedback, a project constraint, a reference) | [`CLAUDE.md`](../../../CLAUDE.md) | a precise edit to the relevant section. **Never an external memory store** — this repo has no memory the team can't see, review, or version; if a fact doesn't fit any existing surface, ask before inventing a new one rather than reaching for one. |
 | The **status of an epic/increment** drifted from reality | flag it — route to the owning **gate** | *do not edit status here*; the gates own PROJECT-STATUS |
+| A **product requirement or UX-consistency fact** (a surface's job changed, a naming convention got established) | [`product/decisions.md`](../../../product/decisions.md) (a new PDR) or [`product/screens-map.md`](../../../product/screens-map.md) (a surface's row) | **propose** the edit; hand it to `product-check` to apply. This skill never writes those files directly — same reasoning as the status row above: one owner per surface. |
 | The **session narrative / open threads** — *only if the topic is worth resuming later* | [`handoffs/`](../../../handoffs/) | defer to `handoff` — an on-demand tool, not an every-story step |
 | *(to define: project-specific homes — add a row for each canonical doc this project keeps beyond the scaffold defaults, e.g. a cost/expenses log, a standing strategic-posture file, an integration-research doc, or an environments/deployment runbook. Map each kind of learning to that file during foundation.)* | — | — |
 

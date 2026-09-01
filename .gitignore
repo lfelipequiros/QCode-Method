@@ -4,6 +4,11 @@
 # qcode-sync writes these into TARGET projects, never here — ignored as a safety net:
 *.qcode-bak
 
+# 05.4 installed the real cockpit/board-check tooling into this repo (it dogfoods its own method
+# now) — the rendered cockpit is a point-in-time build artifact, regenerated on demand via
+# `node cockpit/generate.mjs`, same as the template's own .gitignore already excludes it:
+cockpit/index.html
+
 # Node, if ever introduced:
 node_modules/
 
